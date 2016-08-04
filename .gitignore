@@ -3,3 +3,7 @@
 *.tox
 __pycache__
 dist
+
+/.idea/dataSources.xml
+/.idea/dataSources.local.xml
+/.idea/dataSources.ids
