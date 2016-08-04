@@ -1,6 +1,6 @@
 import re
 
-from pykss.modifier import Modifier
+from pythonkss.modifier import Modifier
 
 
 CLASS_MODIFIER = '.'

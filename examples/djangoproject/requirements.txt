@@ -1,2 +1,0 @@
-Django==1.5
-https://github.com/seanbrant/pykss.git

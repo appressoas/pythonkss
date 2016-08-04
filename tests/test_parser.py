@@ -1,19 +1,19 @@
 import os
 import unittest
 
-import pykss
+import pythonkss
 
 
 class ParseTestCase(unittest.TestCase):
 
     def setUp(self):
         fixtures = os.path.join(os.path.dirname(__file__), 'fixtures')
-        self.scss = pykss.Parser(os.path.join(fixtures, 'scss'))
-        self.less = pykss.Parser(os.path.join(fixtures, 'less'))
-        self.sass = pykss.Parser(os.path.join(fixtures, 'sass'))
-        self.css = pykss.Parser(os.path.join(fixtures, 'css'))
-        self.na = pykss.Parser(os.path.join(fixtures, 'scss'), extensions=['.css'])
-        self.multiple = pykss.Parser(os.path.join(fixtures, 'scss'), os.path.join(fixtures, 'less'))
+        self.scss = pythonkss.Parser(os.path.join(fixtures, 'scss'))
+        self.less = pythonkss.Parser(os.path.join(fixtures, 'less'))
+        self.sass = pythonkss.Parser(os.path.join(fixtures, 'sass'))
+        self.css = pythonkss.Parser(os.path.join(fixtures, 'css'))
+        self.na = pythonkss.Parser(os.path.join(fixtures, 'scss'), extensions=['.css'])
+        self.multiple = pythonkss.Parser(os.path.join(fixtures, 'scss'), os.path.join(fixtures, 'less'))
 
     def test_parses_kss_comments_in_scss(self):
         self.assertEqual(self.scss.section('2.1.1').description, 'Your standard form button.')

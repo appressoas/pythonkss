@@ -1,6 +1,6 @@
 import unittest
 
-from pykss.modifier import Modifier
+from pythonkss.modifier import Modifier
 
 
 class ModiferTestCase(unittest.TestCase):

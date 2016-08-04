@@ -1,6 +1,6 @@
 import unittest
 
-from pykss.section import Section
+from pythonkss.section import Section
 
 
 class SectionTestCase(unittest.TestCase):

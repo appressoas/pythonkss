@@ -1,8 +1,8 @@
 import os
 
-from pykss.comment import CommentParser
-from pykss.exceptions import SectionDoesNotExist
-from pykss.section import Section
+from pythonkss.comment import CommentParser
+from pythonkss.exceptions import SectionDoesNotExist
+from pythonkss.section import Section
 
 
 class Parser(object):

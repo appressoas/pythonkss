@@ -3,7 +3,7 @@
 import os
 import unittest
 
-from pykss import comment
+from pythonkss import comment
 
 
 class CommentMethodTestCase(unittest.TestCase):

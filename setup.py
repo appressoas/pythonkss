@@ -25,7 +25,6 @@ setup(
     test_suite='runtests.runtests',
     extras_require={
         'tests': [
-            'Django>=1.6',
             'flake8',
             'mock',
             'pytest',
