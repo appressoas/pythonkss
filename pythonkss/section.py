@@ -2,6 +2,7 @@ import os
 import re
 
 from pythonkss import markdownformatter
+from pythonkss.example import Example
 from pythonkss.modifier import Modifier
 
 
@@ -27,11 +28,13 @@ class Section(object):
         self._heading = None
         self._description_lines = []
         self._modifiers = []
-        self._example_lines = []
+        self._examples = []
         self._reference = None
 
         in_example = False
         in_modifiers = False
+        example_lines = []
+        example_argumentstring = None
 
         lines = self.comment.strip().splitlines()
         if len(lines) == 0:
@@ -57,8 +60,14 @@ class Section(object):
                     last_modifier.description += ' {0}'.format(description)
 
             elif line.startswith(EXAMPLE_START_ALT1) or line.startswith(EXAMPLE_START_ALT2):
+                if example_lines:
+                    self.add_example_linelist(example_lines, argumentstring=example_argumentstring)
+                example_lines = []
                 in_example = True
                 in_modifiers = False
+                arguments = line.split(':', 1)
+                if len(arguments) > 1:
+                    example_argumentstring = arguments[1]
 
             elif line.startswith(REFERENCE_START):
                 in_example = False
@@ -68,14 +77,15 @@ class Section(object):
                     self._reference = match.groups()[0].rstrip('.')
 
             elif in_example is True:
-                self._example_lines.append(line)
+                example_lines.append(line)
 
             else:
                 in_modifiers = False
                 self._description_lines.append(line)
 
         self._description = '\n'.join(self._description_lines).strip()
-        self.add_example('\n'.join(self._example_lines).strip())
+        if example_lines:
+            self.add_example_linelist(example_lines, argumentstring=example_argumentstring)
 
     @property
     def heading(self):
@@ -100,27 +110,10 @@ class Section(object):
         return self._modifiers
 
     @property
-    def example(self):
+    def examples(self):
         if not hasattr(self, '_modifiers'):
             self.parse()
-        return self._example
-
-    def _get_example_syntax(self):
-        syntax = 'css'
-        if self.filename:
-            extension = os.path.splitext(self.filename)[1]
-            if extension:
-                extension = extension[1:]
-                if extension in ['scss', 'sass', 'less']:
-                    syntax = extension
-        return syntax
-
-    @property
-    def example_html(self):
-        markdowntext = '```{example_syntax}\n{text}\n```'.format(
-            example_syntax=self._get_example_syntax(),
-            text=self.example)
-        return markdownformatter.MarkdownFormatter.to_html(markdowntext=markdowntext)
+        return self._examples
 
     @property
     def section(self):
@@ -128,7 +121,15 @@ class Section(object):
             self.parse()
         return self._reference
 
-    def add_example(self, example):
-        self._example = optional_re.sub('', example).replace('$modifier_class', '')
+    def add_example_linelist(self, example_lines, **kwargs):
+        text = '\n'.join(example_lines).strip()
+        self.add_example(text=text, **kwargs)
+
+    def add_example(self, text, **kwargs):
+        example = Example(
+            text=optional_re.sub('', text).replace('$modifier_class', ''),
+            filename=self.filename,
+            **kwargs)
+        self._examples.append(example)
         for modifier in self._modifiers:
-            modifier.add_example(optional_re.sub(r'\1', example))
+            modifier.add_example(optional_re.sub(r'\1', text))

@@ -47,7 +47,12 @@ class MarkdownFormatter(object):
         for headerlevel in (3, 2, 1):
             for element in soup.find_all('h{}'.format(headerlevel)):
                 element.name = 'h{}'.format(headerlevel + 2)
-        return soup.prettify(encoding='utf-8')
+        try:
+            html = unicode(soup.prettify(encoding='utf-8'), encoding='utf-8')
+        except NameError:
+            html = str(soup.prettify(encoding='utf-8'), encoding='utf-8')
+        html = html.split('<body>')[1].split('</body>')[0]
+        return html
 
     def postprocess_html(self, html):
         return self._make_h1_h3(html)
