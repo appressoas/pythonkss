@@ -67,7 +67,7 @@ class CommentParser(object):
         with codecs.open(self.filename, 'r', 'utf-8') as fileobj:
             for line in fileobj:
                 # Parse single-line style
-                if is_single_line_comment(line):
+                if is_single_line_comment(line) and not inside_multi_line_block:
                     parsed = parse_single_line(line)
 
                     if inside_single_line_block:

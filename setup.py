@@ -3,13 +3,13 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name='pykss',
-    version='0.5',
+    name='pythonkss',
+    version='0.1',
     description='Python implementation of KSS',
-    long_description=open('README.rst').read(),
-    author='Sean Brant',
-    author_email='brant.sean@gmail.com',
-    url='https://github.com/seanbrant/pykss',
+    long_description='See https://github.com/appressoas/pythonkss',
+    author='Espen Angell Kristiansen',
+    author_email='espen@appresso.no',
+    url='https://github.com/appressoas/pythonkss',
     license='BSD',
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
@@ -23,6 +23,12 @@ setup(
     ],
     zip_safe=False,
     test_suite='runtests.runtests',
+    install_requires=[
+        'Markdown',
+        'Pygments',
+        'beautifulsoup4',
+        'html5lib',
+    ],
     extras_require={
         'tests': [
             'flake8',

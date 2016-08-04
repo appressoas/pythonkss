@@ -1,12 +1,15 @@
+import os
 import re
 
+from pythonkss import markdownformatter
 from pythonkss.modifier import Modifier
 
 
 CLASS_MODIFIER = '.'
 PSEUDO_CLASS_MODIFIER = ':'
 MODIFIER_DESCRIPTION_SEPARATOR = ' - '
-EXAMPLE_START = 'Example:'
+EXAMPLE_START_ALT1 = 'Markup:'
+EXAMPLE_START_ALT2 = 'Example:'
 REFERENCE_START = 'Styleguide'
 
 reference_re = re.compile(r'%s ([\d\.]+)' % REFERENCE_START)
@@ -21,6 +24,7 @@ class Section(object):
         self.filename = filename
 
     def parse(self):
+        self._heading = None
         self._description_lines = []
         self._modifiers = []
         self._example_lines = []
@@ -29,7 +33,13 @@ class Section(object):
         in_example = False
         in_modifiers = False
 
-        for line in self.comment.splitlines():
+        lines = self.comment.strip().splitlines()
+        if len(lines) == 0:
+            return
+
+        self._heading = lines[0].strip()
+
+        for line in lines[1:]:
             if line.startswith(CLASS_MODIFIER) or line.startswith(PSEUDO_CLASS_MODIFIER):
                 in_modifiers = True
                 try:
@@ -46,7 +56,7 @@ class Section(object):
                     last_modifier = self._modifiers[-1]
                     last_modifier.description += ' {0}'.format(description)
 
-            elif line.startswith(EXAMPLE_START):
+            elif line.startswith(EXAMPLE_START_ALT1) or line.startswith(EXAMPLE_START_ALT2):
                 in_example = True
                 in_modifiers = False
 
@@ -68,10 +78,20 @@ class Section(object):
         self.add_example('\n'.join(self._example_lines).strip())
 
     @property
+    def heading(self):
+        if not hasattr(self, '_heading'):
+            self.parse()
+        return self._heading
+
+    @property
     def description(self):
         if not hasattr(self, '_description'):
             self.parse()
         return self._description
+
+    @property
+    def description_html(self):
+        return markdownformatter.MarkdownFormatter.to_html(markdowntext=self.description)
 
     @property
     def modifiers(self):
@@ -84,6 +104,23 @@ class Section(object):
         if not hasattr(self, '_modifiers'):
             self.parse()
         return self._example
+
+    def _get_example_syntax(self):
+        syntax = 'css'
+        if self.filename:
+            extension = os.path.splitext(self.filename)[1]
+            if extension:
+                extension = extension[1:]
+                if extension in ['scss', 'sass', 'less']:
+                    syntax = extension
+        return syntax
+
+    @property
+    def example_html(self):
+        markdowntext = '```{example_syntax}\n{text}\n```'.format(
+            example_syntax=self._get_example_syntax(),
+            text=self.example)
+        return markdownformatter.MarkdownFormatter.to_html(markdowntext=markdowntext)
 
     @property
     def section(self):
