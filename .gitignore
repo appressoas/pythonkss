@@ -7,3 +7,4 @@ dist
 /.idea/dataSources.xml
 /.idea/dataSources.local.xml
 /.idea/dataSources.ids
+/not_for_deploy/docs/_build
