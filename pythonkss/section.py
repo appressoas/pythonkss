@@ -115,6 +115,12 @@ class Section(object):
             self.parse()
         return self._examples
 
+    def has_examples(self):
+        return len(self._examples) > 0
+
+    def has_multiple_examples(self):
+        return len(self._examples) > 1
+
     @property
     def section(self):
         if not hasattr(self, '_reference'):

@@ -6,13 +6,14 @@ from pythonkss import markdownformatter
 
 
 class Example(object):
-    def __init__(self, text, filename, syntax=None, title=None, argumentstring=None):
+    def __init__(self, text, filename=None, syntax=None, title=None, argumentstring=None):
         self.text = text
         self.filename = filename
         self.syntax = syntax
         self.title = title
-        self.argumentstring = argumentstring.strip()
+        self.argumentstring = argumentstring
         if argumentstring:
+            self.argumentstring = self.argumentstring.strip()
             self._parse_argumentstring()
 
     def _parse_argumentstring(self):
