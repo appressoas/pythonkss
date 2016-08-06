@@ -34,6 +34,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
+    'sphinxcontrib.napoleon',
+    'sphinx.ext.autosummary',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -322,7 +324,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'PythonKSS', 'PythonKSS Documentation',
-     author, 'PythonKSS', 'One line description of project.',
+     author, 'PythonKSS', 'Python KSS parser.',
      'Miscellaneous'),
 ]
 
@@ -345,3 +347,10 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
+
+
+napoleon_numpy_docstring = False
+
+autoclass_content = 'both'
+autodoc_member_order = 'bysource'
+autodoc_default_flags = ['members', 'show-inheritance']

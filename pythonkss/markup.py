@@ -6,7 +6,40 @@ from pythonkss import markdownformatter
 
 
 class Markup(object):
+    """
+    Represents a Markup part in a :class:`pythonkss.section.Section`
+    (the part that starts with ``Markup:``).
+
+    .. attribute:: text
+
+        The markup text (the lines below ``Markup:``)
+
+    .. attribute:: filename
+
+        The filename. Can be ``None``.
+
+    .. attribute:: title
+
+        The title for the markup block. Can be ``None``.
+
+    .. attribute:: syntax
+
+        The syntax for the markup block. Compatible with Pygments syntax hilighter.
+        Can be ``None``. You will normally want to use :meth:`.get_syntax`
+        instead of this attribute.
+    """
     def __init__(self, text, filename=None, syntax=None, title=None, argumentstring=None):
+        """
+
+        Args:
+            text: The text in the lines below ``Markup:``.
+            filename: The filename that the markup belongs to. Optional.
+            syntax: The syntax. Optional - if not provided, we try to detect it.
+            title: An optional title for the markup block.
+            argumentstring: An optional argumentstring in the following format:
+                ``[(<syntax>)] [<title>]``. If an argumentstring is provided,
+                it overrides anything provided in ``syntax`` and ``title``.
+        """
         self.text = text
         self.filename = filename
         self.syntax = syntax
@@ -30,29 +63,36 @@ class Markup(object):
             self.title = ' '.join(titlewords)
 
     def get_syntax_from_filename(self):
-        syntax = 'css'
+        """
+        Tries to determine the syntax for :attr:`.filename`,
+        falling back to ``html``.
+        """
+        syntax = 'html'
         if self.filename:
             extension = os.path.splitext(self.filename)[1]
             if extension:
                 extension = extension[1:]
-                if extension in ['scss', 'sass', 'less']:
+                if extension in ['css', 'scss', 'sass', 'less']:
                     syntax = extension
         return syntax
 
-    def guess_syntax(self):
-        if self.text.startswith('<') and '>' in self.text:
-            return 'html'
-        else:
-            return self.get_syntax_from_filename()
-
     def get_syntax(self):
+        """
+        Get syntax identifier.
+
+        Returns:
+            str: Returns :attr:`.syntax` if set, falling back to :meth:`.get_syntax_from_filename`.
+        """
         if self.syntax:
             return self.syntax
         else:
-            return self.guess_syntax()
+            return self.get_syntax_from_filename()
 
     @property
     def html(self):
+        """
+        Format the text as HTML with syntax hilighting.
+        """
         markdowntext = '```{syntax}\n{text}\n```'.format(
             syntax=self.get_syntax(),
             text=self.text)

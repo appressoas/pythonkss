@@ -3,6 +3,9 @@ from bs4 import BeautifulSoup
 
 
 class MarkdownFormatter(object):
+    """
+    Markdown formatter used for descriptions and examples.
+    """
     markdown_extensions = [
         # Break into new ul/ol tag when the next line starts with another class of list indicator
         'sane_lists',
@@ -26,6 +29,15 @@ class MarkdownFormatter(object):
 
     @classmethod
     def to_html(cls, markdowntext):
+        """
+        Convert the provided ``markdowntext`` to HTML.
+
+        Args:
+            markdowntext (str): Markdown formatted text.
+
+        Returns:
+            str: The resulting HTML.
+        """
         return cls(markdowntext=markdowntext).resulthtml
 
     def __init__(self, markdowntext):
@@ -55,4 +67,7 @@ class MarkdownFormatter(object):
         return html.strip()
 
     def postprocess_html(self, html):
+        """
+        Postprocess the HTML. Converts <h1>, <h2> and <h3> to <h3>, <h4> and <h5>.
+        """
         return self._make_h1_h3(html)

@@ -16,37 +16,58 @@ class ParseTestCase(unittest.TestCase):
         self.multiple = pythonkss.Parser(os.path.join(fixtures, 'scss'), os.path.join(fixtures, 'less'))
 
     def test_parses_kss_comments_in_scss(self):
-        self.assertEqual(self.scss.section('2.1.1').title, 'Your standard form button.')
+        self.assertEqual(self.scss.get_section_by_reference('2.1.1').title, 'Your standard form button.')
 
     def test_parses_kss_comments_in_less(self):
-        self.assertEqual(self.less.section('2.1.1').title, 'Your standard form button.')
+        self.assertEqual(self.less.get_section_by_reference('2.1.1').title, 'Your standard form button.')
 
     def test_parses_kss_multi_line_comments_in_sass(self):
-        self.assertEqual(self.sass.section('2.1.1').title, 'Your standard form button.')
+        self.assertEqual(self.sass.get_section_by_reference('2.1.1').title, 'Your standard form button.')
 
     def test_parses_kss_single_line_comments_in_sass(self):
-        self.assertEqual(self.sass.section('2.2.1').title, 'A button suitable for giving stars to someone.')
+        self.assertEqual(self.sass.get_section_by_reference('2.2.1').title, 'A button suitable for giving stars to someone.')
 
     def test_parses_kss_comments_in_css(self):
-        self.assertEqual(self.css.section('2.1.1').title, 'Your standard form button.')
+        self.assertEqual(self.css.get_section_by_reference('2.1.1').title, 'Your standard form button.')
 
     def test_parses_nested_scss_documents(self):
-        self.assertEqual(self.scss.section('3.0.0').title, 'Your standard form element.')
-        self.assertEqual(self.scss.section('3.0.1').title, 'Your standard text input box.')
+        self.assertEqual(self.scss.get_section_by_reference('3.0.0').title, 'Your standard form element.')
+        self.assertEqual(self.scss.get_section_by_reference('3.0.1').title, 'Your standard text input box.')
 
     def test_parses_nested_less_documents(self):
-        self.assertEqual(self.less.section('3.0.0').title, 'Your standard form element.')
-        self.assertEqual(self.less.section('3.0.1').title, 'Your standard text input box.')
+        self.assertEqual(self.less.get_section_by_reference('3.0.0').title, 'Your standard form element.')
+        self.assertEqual(self.less.get_section_by_reference('3.0.1').title, 'Your standard text input box.')
 
     def test_parses_nested_sass_documents(self):
-        self.assertEqual(self.sass.section('3.0.0').title, 'Your standard form element.')
-        self.assertEqual(self.sass.section('3.0.1').title, 'Your standard text input box.')
+        self.assertEqual(self.sass.get_section_by_reference('3.0.0').title, 'Your standard form element.')
+        self.assertEqual(self.sass.get_section_by_reference('3.0.1').title, 'Your standard text input box.')
 
     def test_parse_returns_dictionary_of_sections(self):
-        self.assertEqual(len(self.css.sections), 2)
+        self.assertEqual(len(self.css.sections), 3)
 
     def test_parse_multiple_paths(self):
         self.assertEqual(len(self.multiple.sections), 6)
 
     def test_parse_ext_mismatch(self):
         self.assertDictEqual(self.na.sections, {})
+
+    def test_get_sections(self):
+        sections = self.css.get_sections()
+        references = set(section.reference for section in sections)
+        self.assertEqual(references, {'1', '2.1.1', '2.2.1'})
+
+    def test_get_sections_referenceprefix(self):
+        sections = list(self.css.get_sections(referenceprefix='2'))
+        references = set(section.reference for section in sections)
+        self.assertEqual(references, {'2.1.1', '2.2.1'})
+
+    def test_iter_sorted_sections(self):
+        sorted_sections = list(self.css.iter_sorted_sections())
+        self.assertEqual(sorted_sections[0].reference, '1')
+        self.assertEqual(sorted_sections[1].reference, '2.1.1')
+        self.assertEqual(sorted_sections[2].reference, '2.2.1')
+
+    def test_iter_sorted_sections_referenceprefix(self):
+        sorted_sections = list(self.css.iter_sorted_sections(referenceprefix='2'))
+        self.assertEqual(sorted_sections[0].reference, '2.1.1')
+        self.assertEqual(sorted_sections[1].reference, '2.2.1')

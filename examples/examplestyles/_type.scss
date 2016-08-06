@@ -1,0 +1,55 @@
+/* Basic typography
+
+Styleguide 1
+*/
+
+
+/* Header styles
+
+Our header styles:
+
+- `h1.xlarge` - <h1 class="xlarge">Sit Fringilla Ultricies</h1>
+- `h1` - <h1>Sit Fringilla Ultricies</h1>
+- `h2` - <h2>Sit Fringilla Ultricies</h2>
+- `h2` - <h3>Sit Fringilla Ultricies</h3>
+
+Markup:
+<h1 class="xlarge">Sit Fringilla Ultricies</h1>
+<h1>Sit Fringilla Ultricies</h1>
+<h2>Sit Fringilla Ultricies</h2>
+<h3>Sit Fringilla Ultricies</h3>
+
+Styleguide 1.1
+*/
+h1 {
+    font-size: 40px;
+
+    &.xlarge {
+
+    }
+}
+
+h2 {
+    font-size: 26px;
+}
+
+h3 {
+    font-size: 18px;
+}
+
+
+/* Emphasize text
+
+We provide two ways to emphasize text:
+
+- <strong>Strongly emphasized</strong>
+- <em>Lightly emphasized</em>
+
+Markup:
+<strong>Strongly emphasized</strong>
+<em>Lightly emphasized</em>
+
+Styleguide: 1.2
+*/
+em {}
+strong{}

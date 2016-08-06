@@ -54,11 +54,28 @@ def normalize(lines):
 
 
 class CommentParser(object):
+    """
+    The comment parser.
+
+    Takes a filename, and parses it into a list of comment blocks.
+
+    Used by :class:`pythonkss.parser.Parser`.
+    """
 
     def __init__(self, filename):
+        """
+        Args:
+            filename: The path to a style file.
+        """
         self.filename = filename
 
     def parse(self):
+        """
+        Parse the file and collect comment blocks in a list.
+
+        Returns:
+            list: Comment blocks list.
+        """
         blocks = []
         current_block = []
         inside_single_line_block = False
@@ -102,6 +119,11 @@ class CommentParser(object):
 
     @property
     def blocks(self):
+        """
+        Property that returns a list of comment blocks in the file.
+
+        Parses the file using :meth:`.parse` the first time it is called.
+        """
         if not hasattr(self, '_blocks'):
             self._blocks = self.parse()
         return self._blocks

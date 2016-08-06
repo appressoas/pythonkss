@@ -36,3 +36,27 @@ a.button.star {
     color: #ae7e00; }
   a.button.star.disabled {
     opacity: 0.5; }
+
+
+/*
+The strong element.
+
+- Use for emphasizing text that require extra focus.
+- **DO NOT** use for headings.
+
+Example:
+<strong>Strong text</strong>
+<strong class="extrastrong">Extra strong text</strong>
+
+Markup:
+<strong>Strong text</strong>
+<strong class="extrastrong">Extra strong text</strong>
+
+Styleguide 1
+*/
+strong {
+  font-weight: bold;
+}
+strong.extrastrong {
+  font-weight: 700;
+}

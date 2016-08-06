@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    style_documentation_syntax
+   api
 
 
 

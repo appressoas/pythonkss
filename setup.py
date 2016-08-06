@@ -11,7 +11,7 @@ setup(
     author_email='espen@appresso.no',
     url='https://github.com/appressoas/pythonkss',
     license='BSD',
-    packages=find_packages(exclude=['tests']),
+    packages=find_packages(exclude=['tests', 'examples']),
     include_package_data=True,
     classifiers=[
         'Development Status :: 4 - Beta',
