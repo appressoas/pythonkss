@@ -25,7 +25,8 @@ class ParseTestCase(unittest.TestCase):
         self.assertEqual(self.sass.get_section_by_reference('2.1.1').title, 'Your standard form button.')
 
     def test_parses_kss_single_line_comments_in_sass(self):
-        self.assertEqual(self.sass.get_section_by_reference('2.2.1').title, 'A button suitable for giving stars to someone.')
+        self.assertEqual(self.sass.get_section_by_reference('2.2.1').title,
+                         'A button suitable for giving stars to someone.')
 
     def test_parses_kss_comments_in_css(self):
         self.assertEqual(self.css.get_section_by_reference('2.1.1').title, 'Your standard form button.')

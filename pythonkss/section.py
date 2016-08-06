@@ -1,4 +1,3 @@
-import os
 import re
 
 from pythonkss import markdownformatter
@@ -17,6 +16,75 @@ optional_re = re.compile(r'\[(.*)\]\?')
 multiline_modifier_re = re.compile(r'^\s+(\w.*)')
 
 
+class SectionParser(object):
+    def __init__(self, comment):
+        self.comment = comment
+        self.title = None
+        self.description_lines = []
+        self.modifiers = []
+        self.markups = []
+        self.reference = None
+        self.markups = []
+
+        self.in_markup = False
+        self.in_modifiers = False
+        self.markup_lines = []
+        self.markup_argumentstring = None
+        self.parse()
+
+    def parse_line(self, line):
+        if line.startswith(CLASS_MODIFIER) or line.startswith(PSEUDO_CLASS_MODIFIER):
+            self.in_modifiers = True
+            try:
+                modifier, description = line.split(MODIFIER_DESCRIPTION_SEPARATOR)
+            except ValueError:
+                pass
+            else:
+                self.modifiers.append(Modifier(modifier.strip(), description.strip()))
+
+        elif self.in_modifiers and multiline_modifier_re.match(line):
+            match = multiline_modifier_re.match(line)
+            if match:
+                description = match.groups()[0]
+                last_modifier = self.modifiers[-1]
+                last_modifier.description += ' {0}'.format(description)
+
+        elif line.startswith(MARKUP_START_ALT1):
+            if self.markup_lines:
+                self.markups.append([self.markup_lines, self.markup_argumentstring])
+            self.markup_lines = []
+            self.in_markup = True
+            self.in_modifiers = False
+            arguments = line.split(':', 1)
+            if len(arguments) > 1:
+                self.markup_argumentstring = arguments[1]
+
+        elif line.startswith(REFERENCE_START):
+            self.in_markup = False
+            self.in_modifiers = False
+            match = reference_re.match(line)
+            if match:
+                self.reference = match.groups()[0].rstrip('.')
+
+        elif self.in_markup is True:
+            self.markup_lines.append(line)
+
+        else:
+            self.in_modifiers = False
+            self.description_lines.append(line)
+
+    def parse(self):
+        lines = self.comment.strip().splitlines()
+        if len(lines) == 0:
+            return
+        self.title = lines[0].strip()
+        for line in lines[1:]:
+            self.parse_line(line=line)
+        self.description = '\n'.join(self.description_lines).strip()
+        if self.markup_lines:
+            self.markups.append([self.markup_lines, self.markup_argumentstring])
+
+
 class Section(object):
     """
     A section in the documentation.
@@ -27,67 +95,14 @@ class Section(object):
         self.filename = filename
 
     def parse(self):
-        self._title = None
-        self._description_lines = []
-        self._modifiers = []
+        sectionparser = SectionParser(comment=self.comment)
+        self._title = sectionparser.title
+        self._description = sectionparser.description
+        self._modifiers = sectionparser.modifiers
+        self._reference = sectionparser.reference
         self._markups = []
-        self._reference = None
-
-        in_markup = False
-        in_modifiers = False
-        markup_lines = []
-        markup_argumentstring = None
-
-        lines = self.comment.strip().splitlines()
-        if len(lines) == 0:
-            return
-
-        self._title = lines[0].strip()
-
-        for line in lines[1:]:
-            if line.startswith(CLASS_MODIFIER) or line.startswith(PSEUDO_CLASS_MODIFIER):
-                in_modifiers = True
-                try:
-                    modifier, description = line.split(MODIFIER_DESCRIPTION_SEPARATOR)
-                except ValueError:
-                    pass
-                else:
-                    self._modifiers.append(Modifier(modifier.strip(), description.strip()))
-
-            elif in_modifiers and multiline_modifier_re.match(line):
-                match = multiline_modifier_re.match(line)
-                if match:
-                    description = match.groups()[0]
-                    last_modifier = self._modifiers[-1]
-                    last_modifier.description += ' {0}'.format(description)
-
-            elif line.startswith(MARKUP_START_ALT1):
-                if markup_lines:
-                    self._add_markup_linelist(markup_lines, argumentstring=markup_argumentstring)
-                markup_lines = []
-                in_markup = True
-                in_modifiers = False
-                arguments = line.split(':', 1)
-                if len(arguments) > 1:
-                    markup_argumentstring = arguments[1]
-
-            elif line.startswith(REFERENCE_START):
-                in_markup = False
-                in_modifiers = False
-                match = reference_re.match(line)
-                if match:
-                    self._reference = match.groups()[0].rstrip('.')
-
-            elif in_markup is True:
-                markup_lines.append(line)
-
-            else:
-                in_modifiers = False
-                self._description_lines.append(line)
-
-        self._description = '\n'.join(self._description_lines).strip()
-        if markup_lines:
-            self._add_markup_linelist(markup_lines, argumentstring=markup_argumentstring)
+        for lines, argumentstring in sectionparser.markups:
+            self._add_markup_linelist(markup_lines=lines, argumentstring=argumentstring)
 
     @property
     def title(self):
