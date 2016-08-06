@@ -7,6 +7,18 @@ If you are looking for a way to render the styleguide, write your own using
 `https://github.com/appressoas/pythonkss/blob/master/examples/startingpoint.py`_
 as a starting point.
 
+Install
+=======
+::
+
+   $ pip install pythonkss
+
+
+Getting started
+===============
+Take a look at https://github.com/appressoas/pythonkss/blob/master/examples/startingpoint.py,
+or read the :doc:`api`.
+
 
 Contents:
 
