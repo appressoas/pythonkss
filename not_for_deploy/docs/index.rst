@@ -11,7 +11,7 @@ Install
 =======
 ::
 
-   $ pip install pythonkss
+   pip install pythonkss
 
 
 Getting started

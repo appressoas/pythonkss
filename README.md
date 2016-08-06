@@ -12,4 +12,4 @@ The official [page](http://warpspire.com/kss/) provide a good introduction to KS
 
 
 ## Docs
-TODO
+http://pythonkss.readthedocs.io/
