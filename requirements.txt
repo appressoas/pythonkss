@@ -9,7 +9,6 @@ html5lib==0.9999999
 # For building docs
 Sphinx==1.4.5
 appresso_sphinx_extensions==1.0.0
-sphinx-rtd-theme==0.1.9
 sphinxcontrib-napoleon==0.5.2
 
 -e .

@@ -62,31 +62,17 @@ class Markup(object):
         if titlewords:
             self.title = ' '.join(titlewords)
 
-    def get_syntax_from_filename(self):
-        """
-        Tries to determine the syntax for :attr:`.filename`,
-        falling back to ``html``.
-        """
-        syntax = 'html'
-        if self.filename:
-            extension = os.path.splitext(self.filename)[1]
-            if extension:
-                extension = extension[1:]
-                if extension in ['css', 'scss', 'sass', 'less']:
-                    syntax = extension
-        return syntax
-
     def get_syntax(self):
         """
         Get syntax identifier.
 
         Returns:
-            str: Returns :attr:`.syntax` if set, falling back to :meth:`.get_syntax_from_filename`.
+            str: Returns :attr:`.syntax` if set, falling back to "html".
         """
         if self.syntax:
             return self.syntax
         else:
-            return self.get_syntax_from_filename()
+            return "html"
 
     @property
     def html(self):
