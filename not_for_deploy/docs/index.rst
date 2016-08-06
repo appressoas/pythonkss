@@ -1,10 +1,12 @@
-.. PythonKSS documentation master file, created by
-   sphinx-quickstart on Fri Aug  5 12:29:17 2016.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to PythonKSS's documentation!
 =====================================
+
+This is a library for parsing the KSS format (with some extra formatting sugar).
+
+If you are looking for a way to render the styleguide, write your own using
+`https://github.com/appressoas/pythonkss/blob/master/examples/startingpoint.py`_
+as a starting point.
+
 
 Contents:
 
@@ -16,11 +18,9 @@ Contents:
    develop
 
 
-
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
