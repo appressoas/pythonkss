@@ -52,7 +52,7 @@ class MarkdownFormatter(object):
         except NameError:
             html = str(soup.prettify(encoding='utf-8'), encoding='utf-8')
         html = html.split('<body>')[1].split('</body>')[0]
-        return html
+        return html.strip()
 
     def postprocess_html(self, html):
         return self._make_h1_h3(html)

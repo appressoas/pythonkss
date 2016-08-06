@@ -1,5 +1,5 @@
 from pythonkss import markdownformatter
-from pythonkss.example import Example
+from pythonkss.markup import Markup
 
 
 class Modifier(object):
@@ -7,15 +7,15 @@ class Modifier(object):
     def __init__(self, name, description):
         self.name = name
         self.description = description
-        self.example = None
+        self.markup = None
 
     @property
     def class_name(self):
         return self.name.replace('.', ' ').replace(':', ' pseudo-class-').strip()
 
-    def add_example(self, example):
-        self.example = Example(
-            text=example.replace('$modifier_class', ' %s' % self.class_name))
+    def add_markup(self, markup):
+        self.markup = Markup(
+            text=markup.replace('$modifier_class', ' %s' % self.class_name))
 
     @property
     def description_html(self):

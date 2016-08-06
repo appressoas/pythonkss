@@ -11,6 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   style_documentation_syntax
+
 
 
 Indices and tables

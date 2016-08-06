@@ -21,8 +21,8 @@ class Parser(object):
             parser = CommentParser(filename)
             for block in parser.blocks:
                 section = Section(block, os.path.basename(filename))
-                if section.section:
-                    sections[section.section] = section
+                if section.reference:
+                    sections[section.reference] = section
 
         return sections
 

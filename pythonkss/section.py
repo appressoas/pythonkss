@@ -2,15 +2,14 @@ import os
 import re
 
 from pythonkss import markdownformatter
-from pythonkss.example import Example
+from pythonkss.markup import Markup
 from pythonkss.modifier import Modifier
 
 
 CLASS_MODIFIER = '.'
 PSEUDO_CLASS_MODIFIER = ':'
 MODIFIER_DESCRIPTION_SEPARATOR = ' - '
-EXAMPLE_START_ALT1 = 'Markup:'
-EXAMPLE_START_ALT2 = 'Example:'
+MARKUP_START_ALT1 = 'Markup:'
 REFERENCE_START = 'Styleguide'
 
 reference_re = re.compile(r'%s ([\d\.]+)' % REFERENCE_START)
@@ -19,28 +18,31 @@ multiline_modifier_re = re.compile(r'^\s+(\w.*)')
 
 
 class Section(object):
+    """
+    A section in the documentation.
+    """
 
     def __init__(self, comment=None, filename=None):
         self.comment = comment or ''
         self.filename = filename
 
     def parse(self):
-        self._heading = None
+        self._title = None
         self._description_lines = []
         self._modifiers = []
-        self._examples = []
+        self._markups = []
         self._reference = None
 
-        in_example = False
+        in_markup = False
         in_modifiers = False
-        example_lines = []
-        example_argumentstring = None
+        markup_lines = []
+        markup_argumentstring = None
 
         lines = self.comment.strip().splitlines()
         if len(lines) == 0:
             return
 
-        self._heading = lines[0].strip()
+        self._title = lines[0].strip()
 
         for line in lines[1:]:
             if line.startswith(CLASS_MODIFIER) or line.startswith(PSEUDO_CLASS_MODIFIER):
@@ -59,83 +61,118 @@ class Section(object):
                     last_modifier = self._modifiers[-1]
                     last_modifier.description += ' {0}'.format(description)
 
-            elif line.startswith(EXAMPLE_START_ALT1) or line.startswith(EXAMPLE_START_ALT2):
-                if example_lines:
-                    self.add_example_linelist(example_lines, argumentstring=example_argumentstring)
-                example_lines = []
-                in_example = True
+            elif line.startswith(MARKUP_START_ALT1):
+                if markup_lines:
+                    self._add_markup_linelist(markup_lines, argumentstring=markup_argumentstring)
+                markup_lines = []
+                in_markup = True
                 in_modifiers = False
                 arguments = line.split(':', 1)
                 if len(arguments) > 1:
-                    example_argumentstring = arguments[1]
+                    markup_argumentstring = arguments[1]
 
             elif line.startswith(REFERENCE_START):
-                in_example = False
+                in_markup = False
                 in_modifiers = False
                 match = reference_re.match(line)
                 if match:
                     self._reference = match.groups()[0].rstrip('.')
 
-            elif in_example is True:
-                example_lines.append(line)
+            elif in_markup is True:
+                markup_lines.append(line)
 
             else:
                 in_modifiers = False
                 self._description_lines.append(line)
 
         self._description = '\n'.join(self._description_lines).strip()
-        if example_lines:
-            self.add_example_linelist(example_lines, argumentstring=example_argumentstring)
+        if markup_lines:
+            self._add_markup_linelist(markup_lines, argumentstring=markup_argumentstring)
 
     @property
-    def heading(self):
-        if not hasattr(self, '_heading'):
+    def title(self):
+        """
+        Get the title (the first line of the comment).
+        """
+        if not hasattr(self, '_title'):
             self.parse()
-        return self._heading
+        return self._title
 
     @property
     def description(self):
+        """
+        Get the description as plain text.
+        """
         if not hasattr(self, '_description'):
             self.parse()
         return self._description
 
     @property
     def description_html(self):
+        """
+        Get the :meth:`.description` converted to markdown using
+        :class:`pythonkss.markdownformatter.MarkdownFormatter`.
+        """
         return markdownformatter.MarkdownFormatter.to_html(markdowntext=self.description)
 
     @property
     def modifiers(self):
+        """
+        Get a list of :class:`pythonkss.modifier.Modifier` objects.
+        One for each modifier in the comment.
+        """
         if not hasattr(self, '_modifiers'):
             self.parse()
         return self._modifiers
 
     @property
-    def examples(self):
+    def markups(self):
+        """
+        Get all ``Markup:`` sections as a list of :class:`pythonkss.markup.Markup` objects.
+        """
         if not hasattr(self, '_modifiers'):
             self.parse()
-        return self._examples
+        return self._markups
 
-    def has_examples(self):
-        return len(self._examples) > 0
+    def has_markups(self):
+        """
+        Returns ``True`` if the section has at least one ``Markup:`` section.
+        """
+        return len(self._markups) > 0
 
-    def has_multiple_examples(self):
-        return len(self._examples) > 1
+    def has_multiple_markups(self):
+        """
+        Returns ``True`` if the section more than one ``Markup:`` section.
+        """
+        return len(self._markups) > 1
 
     @property
-    def section(self):
+    def reference(self):
+        """
+        Get the reference.
+
+        This is the part after ``Styleguide:`` at the end of the comment.
+        """
         if not hasattr(self, '_reference'):
             self.parse()
         return self._reference
 
-    def add_example_linelist(self, example_lines, **kwargs):
-        text = '\n'.join(example_lines).strip()
-        self.add_example(text=text, **kwargs)
+    def _add_markup_linelist(self, markup_lines, **kwargs):
+        text = '\n'.join(markup_lines).strip()
+        self.add_markup(text=text, **kwargs)
 
-    def add_example(self, text, **kwargs):
-        example = Example(
+    def add_markup(self, text, **kwargs):
+        """
+        Add a markup block to the section
+
+        Args:
+            text: The text for the example.
+            **kwargs: Kwargs for :class:`pythonkss.markup.Markup`.
+        """
+        markup = Markup(
             text=optional_re.sub('', text).replace('$modifier_class', ''),
             filename=self.filename,
             **kwargs)
-        self._examples.append(example)
+        self._markups.append(markup)
         for modifier in self._modifiers:
-            modifier.add_example(optional_re.sub(r'\1', text))
+            modifier.add_markup(optional_re.sub(r'\1', text))

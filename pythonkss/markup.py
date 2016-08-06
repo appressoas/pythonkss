@@ -5,7 +5,7 @@ import os
 from pythonkss import markdownformatter
 
 
-class Example(object):
+class Markup(object):
     def __init__(self, text, filename=None, syntax=None, title=None, argumentstring=None):
         self.text = text
         self.filename = filename

@@ -5,6 +5,9 @@
     <orderEntry type="jdk" jdkName="Python 3.4.3 virtualenv at ~/.virtualenvs/pythonkss" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PyDocumentationSettings">
+    <option name="myDocStringFormat" value="Google" />
+  </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Jinja2" />
     <option name="TEMPLATE_FOLDERS">
