@@ -1,10 +1,15 @@
-#!/usr/bin/env python
+import json
+import os
+
 from setuptools import setup, find_packages
+
+with open(os.path.join(os.path.dirname(__file__), 'pythonkss', 'version.json')) as f:
+    version = json.loads(f.read())
 
 
 setup(
     name='pythonkss',
-    version='0.1',
+    version=version,
     description='Python implementation of KSS',
     long_description='See https://github.com/appressoas/pythonkss',
     author='Espen Angell Kristiansen',
