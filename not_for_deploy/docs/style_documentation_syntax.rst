@@ -21,7 +21,7 @@ Format overview
 
     Markup: (followed by the lines of the example)
 
-    Styleguide <section - I.E.: 2.3>
+    Styleguide <reference - I.E.: 2.3>
     */
 
 
@@ -90,7 +90,7 @@ Format specification::
 Markup
 ======
 A markup section is a (typically syntax hilighted) example. You start a markup part
-with ``Markup:`` and any line below that until another ``Markup:`` or a ``Styleguide:``
+with ``Markup:`` and any line below that until another ``Markup:`` or a ``Styleguide`` line.
 line is part of the example.
 
 Simple exmaple:

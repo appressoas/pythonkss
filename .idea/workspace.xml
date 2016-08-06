@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="402b61bd-4734-48b3-a9b7-446ca08c0543" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/not_for_deploy/docs/index.rst" afterPath="$PROJECT_DIR$/not_for_deploy/docs/index.rst" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/not_for_deploy/docs/style_documentation_syntax.rst" afterPath="$PROJECT_DIR$/not_for_deploy/docs/style_documentation_syntax.rst" />
     </list>
     <ignored path="pythonkss.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -66,11 +66,31 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.rst" pinned="false" current-in-tab="true">
+      <file leaf-file-name="index.rst" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/not_for_deploy/docs/index.rst">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.4598726">
-              <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+            <state vertical-scroll-proportion="-14.074074">
+              <caret line="20" column="0" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="_buttons.scss" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/examples/examplestyles/_buttons.scss">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-10.178572">
+              <caret line="15" column="19" selection-start-line="15" selection-start-column="19" selection-end-line="15" selection-end-column="19" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="style_documentation_syntax.rst" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/not_for_deploy/docs/style_documentation_syntax.rst">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.4716749">
+              <caret line="97" column="11" selection-start-line="97" selection-start-column="11" selection-end-line="97" selection-end-column="11" />
               <folding />
             </state>
           </provider>
@@ -112,12 +132,12 @@
         <option value="$PROJECT_DIR$/requirements.txt" />
         <option value="$PROJECT_DIR$/not_for_deploy/docs/api.rst" />
         <option value="$PROJECT_DIR$/not_for_deploy/docs/develop.rst" />
-        <option value="$PROJECT_DIR$/not_for_deploy/docs/style_documentation_syntax.rst" />
-        <option value="$PROJECT_DIR$/tox.ini" />
         <option value="$PROJECT_DIR$/pythonkss/markup.py" />
         <option value="$PROJECT_DIR$/pythonkss/section.py" />
         <option value="$PROJECT_DIR$/tests/test_parser.py" />
         <option value="$PROJECT_DIR$/not_for_deploy/docs/index.rst" />
+        <option value="$PROJECT_DIR$/tox.ini" />
+        <option value="$PROJECT_DIR$/not_for_deploy/docs/style_documentation_syntax.rst" />
       </list>
     </option>
   </component>
@@ -733,7 +753,13 @@
       <option name="project" value="LOCAL" />
       <updated>1470489971362</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Some documentation cleanup.">
+      <created>1470490174580</created>
+      <option name="number" value="00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1470490174580</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -816,7 +842,8 @@
     <MESSAGE value="Renamed example to markup, and added some tests and docs." />
     <MESSAGE value="Docs." />
     <MESSAGE value="section: Split the parsing code into a separate class." />
-    <option name="LAST_COMMIT_MESSAGE" value="section: Split the parsing code into a separate class." />
+    <MESSAGE value="Some documentation cleanup." />
+    <option name="LAST_COMMIT_MESSAGE" value="Some documentation cleanup." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -1065,14 +1092,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/examples/examplestyles/_buttons.scss">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.43445122">
-          <caret line="15" column="19" selection-start-line="15" selection-start-column="19" selection-end-line="15" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pythonkss/markup.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1099,14 +1118,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/not_for_deploy/docs/style_documentation_syntax.rst">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4827586">
-          <caret line="278" column="24" selection-start-line="278" selection-start-column="24" selection-end-line="278" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/requirements.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.3275862">
@@ -1123,10 +1134,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tests/test_parser.py">
+    <entry file="file://$PROJECT_DIR$/tox.ini">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="74" column="0" selection-start-line="74" selection-start-column="0" selection-end-line="74" selection-end-column="0" />
+          <caret line="46" column="0" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/examplestyles/_buttons.scss">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-10.178572">
+          <caret line="15" column="19" selection-start-line="15" selection-start-column="19" selection-end-line="15" selection-end-column="19" />
           <folding />
         </state>
       </provider>
@@ -1141,18 +1160,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tox.ini">
+    <entry file="file://$PROJECT_DIR$/tests/test_parser.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="46" column="0" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
+          <caret line="74" column="0" selection-start-line="74" selection-start-column="0" selection-end-line="74" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/not_for_deploy/docs/index.rst">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4598726">
-          <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
+        <state vertical-scroll-proportion="-14.074074">
+          <caret line="20" column="0" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/not_for_deploy/docs/style_documentation_syntax.rst">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.4716749">
+          <caret line="97" column="11" selection-start-line="97" selection-start-column="11" selection-end-line="97" selection-end-column="11" />
           <folding />
         </state>
       </provider>
