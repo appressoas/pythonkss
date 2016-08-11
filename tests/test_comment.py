@@ -78,3 +78,19 @@ This comment has a indented example
 
     def test_handles_unicode_in_comments(self):
         self.assertTrue(u'Hello, 世界' in self.comments)
+
+
+class CommentVariablesTestCase(unittest.TestCase):
+    def test_no_variables(self):
+        filepath = os.path.join(os.path.dirname(__file__), 'fixtures', 'variables_in_comments.txt')
+        comments = comment.CommentParser(filepath).blocks
+        self.assertEqual('The value of $test-variable is {% $test-variable %}.', comments[0])
+
+    def test_with_variables(self):
+        filepath = os.path.join(os.path.dirname(__file__), 'fixtures', 'variables_in_comments.txt')
+        comments = comment.CommentParser(filepath, variablemap={
+            '{% $test-variable %}': '10px',
+            '{% another-variable %}': 'hello'
+        }).blocks
+        self.assertEqual('The value of $test-variable is 10px.', comments[0])
+        self.assertEqual('Another variable: hello.', comments[1])

@@ -62,12 +62,28 @@ class CommentParser(object):
     Used by :class:`pythonkss.parser.Parser`.
     """
 
-    def __init__(self, filename):
+    def __init__(self, filename, variablemap=None):
         """
         Args:
             filename: The path to a style file.
+            variablemap (dict): Maps variable substitution strings to values.
+                We replace all occurrences of each key with the value in all parsed
+                comments.
         """
         self.filename = filename
+        self.variablemap = variablemap
+
+    def _apply_variables_to_commentblock(self, commentblock):
+        for key, value in self.variablemap.items():
+            commentblock = commentblock.replace(key, value)
+        return commentblock
+
+    def _apply_variables_to_commentblocks(self, commentblocks):
+        commentblocks_with_variables_applied = []
+        for commentblock in commentblocks:
+            commentblocks_with_variables_applied.append(
+                self._apply_variables_to_commentblock(commentblock=commentblock))
+        return commentblocks_with_variables_applied
 
     def parse(self):
         """
@@ -114,6 +130,9 @@ class CommentParser(object):
 
                     inside_single_line_block = False
                     current_block = []
+
+        if self.variablemap:
+            blocks = self._apply_variables_to_commentblocks(commentblocks=blocks)
 
         return blocks
 

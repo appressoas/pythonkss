@@ -1,0 +1,7 @@
+/*
+The value of $test-variable is {% $test-variable %}.
+*/
+
+/*
+Another variable: {% another-variable %}.
+*/

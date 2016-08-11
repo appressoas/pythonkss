@@ -48,21 +48,44 @@ class Parser(object):
             *paths: One or more directories to search for style files.
             extensions: List of file extensions to search for.
                 Optional - defaults to ``['.less', '.css', '.sass', '.scss']``.
+            variables (dict): Dict that maps variables to values.
+                Variables can be used anywhere in the comments, and they are
+                applied before any other parsing of the comments.
+            variablepattern: The pattern used to insert variables. Defaults
+                to ``{{% {variable} %}}``, which means that you would
+                insert a variable added as ``$my-variable`` via the ``variables``
+                parameter with something like this::
 
-        Returns:
+                    /* My title
 
+                    The value of $my-variable is {% $my-variable %}.
+
+                    Styleguide 1.1
+                    */
         """
         self.paths = paths
+        self.variables = kwargs.pop('variables', None)
+        self.variablepattern = kwargs.pop('variablepattern', '{{% {variable} %}}')
         extensions = kwargs.pop('extensions', None)
         if extensions is None:
             extensions = ['.less', '.css', '.sass', '.scss']
         self.extensions = extensions
 
+    def _make_variablemap(self):
+        variablemap = {}
+        if not self.variables:
+            return variablemap
+        for variable, value in self.variables.items():
+            mapkey = self.variablepattern.format(variable=variable)
+            variablemap[mapkey] = value
+        return variablemap
+
     def parse(self):
         sections = {}
+        variablemap = self._make_variablemap()
 
         for filename in self.find_files():
-            parser = CommentParser(filename)
+            parser = CommentParser(filename, variablemap=variablemap)
             for block in parser.blocks:
                 section = Section(block, os.path.basename(filename))
                 if section.reference:
@@ -71,7 +94,12 @@ class Parser(object):
         return sections
 
     def find_files(self):
-        '''Find files in `paths` which match valid extensions'''
+        """
+        Find files in `paths` which match valid extensions.
+
+        Returns:
+            iterator: An iterable yielding file paths.
+        """
         for path in self.paths:
             for subpath, dirs, files in os.walk(path):
                 for filename in files:

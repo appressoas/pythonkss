@@ -12,6 +12,12 @@ class ParseTestCase(unittest.TestCase):
         self.less = pythonkss.Parser(os.path.join(fixtures, 'less'))
         self.sass = pythonkss.Parser(os.path.join(fixtures, 'sass'))
         self.css = pythonkss.Parser(os.path.join(fixtures, 'css'))
+        self.css_with_variables = pythonkss.Parser(
+            os.path.join(fixtures, 'css'),
+            variables={
+                '$test-variable': '"The test variable value"'
+            }
+        )
         self.na = pythonkss.Parser(os.path.join(fixtures, 'scss'), extensions=['.css'])
         self.multiple = pythonkss.Parser(os.path.join(fixtures, 'scss'), os.path.join(fixtures, 'less'))
 
@@ -72,3 +78,7 @@ class ParseTestCase(unittest.TestCase):
         sorted_sections = list(self.css.iter_sorted_sections(referenceprefix='2'))
         self.assertEqual(sorted_sections[0].reference, '2.1.1')
         self.assertEqual(sorted_sections[1].reference, '2.2.1')
+
+    def test_variable(self):
+        description = self.css_with_variables.get_section_by_reference('2.2.1').description
+        self.assertEqual('The value of $test-variable: "The test variable value"', description)
