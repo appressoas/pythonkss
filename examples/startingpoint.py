@@ -25,11 +25,15 @@ def generate_styleguide(*paths):
             print()
             print(section.description_html)
 
-        if section.has_markups():
+        if section.has_examples() or section.has_markups():
             print()
             print('Usage:')
             print('=' * 70)
             print()
+            for example in section.examples:
+                if example.title:
+                    print('-- ', example.title, ' --')
+                print(example.html)
             for markup in section.markups:
                 if markup.title:
                     print('-- ', markup.title, ' --')

@@ -112,6 +112,9 @@ class ParseTestCase(unittest.TestCase):
         self.assertEqual('css', markup.syntax)
         self.assertEqual('A title', markup.title)
 
+    def test_example_notindented(self):
+        self.assertEqual(0, len(self.css.get_section_by_reference('2.1.1').examples))
+
     def test_markup_sanity(self):
         markup = self.css.get_section_by_reference('1').markups[0]
         self.assertEqual(
@@ -138,3 +141,6 @@ class ParseTestCase(unittest.TestCase):
         self.assertEqual('The title', markup.title)
         self.assertEqual('with syntax and title', markup.text)
         self.assertEqual('css', markup.syntax)
+
+    def test_markup_notindented(self):
+        self.assertEqual(0, len(self.css.get_section_by_reference('2.1.1').markups))

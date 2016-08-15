@@ -83,6 +83,6 @@ class MarkupExampleBase(object):
         Format the text as HTML with syntax hilighting.
         """
         markdowntext = '```{syntax}\n{text}\n```'.format(
-            syntax=self.get_syntax(),
+            syntax=self.syntax,
             text=self.text)
         return markdownformatter.MarkdownFormatter.to_html(markdowntext=markdowntext)

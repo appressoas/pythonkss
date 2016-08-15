@@ -215,7 +215,7 @@ class Section(object):
     @property
     def examples(self):
         """
-        Get all ``Markup:`` sections as a list of :class:`pythonkss.example.Example` objects.
+        Get all ``Example:`` sections as a list of :class:`pythonkss.example.Example` objects.
         """
         if not hasattr(self, '_modifiers'):
             self.parse()
@@ -223,13 +223,13 @@ class Section(object):
 
     def has_examples(self):
         """
-        Returns ``True`` if the section has at least one ``Markup:`` section.
+        Returns ``True`` if the section has at least one ``Example:`` section.
         """
         return len(self._examples) > 0
 
     def has_multiple_examples(self):
         """
-        Returns ``True`` if the section more than one ``Markup:`` section.
+        Returns ``True`` if the section more than one ``Example:`` section.
         """
         return len(self._examples) > 1
 
