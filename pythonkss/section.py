@@ -108,12 +108,12 @@ class SectionParser(object):
 
         elif line.startswith(MARKUP_START):
             self._parse_markup_start(line=line)
-        elif self.in_markup is True and intented_line_re.match(line):
+        elif self.in_markup is True and (intented_line_re.match(line) or line.strip() == ''):
             self._parse_in_markup(line=line)
 
         elif line.startswith(EXAMPLE_START):
             self._parse_example_start(line=line)
-        elif self.in_example is True and intented_line_re.match(line):
+        elif self.in_example is True and (intented_line_re.match(line) or line.strip() == ''):
             self._parse_in_example(line=line)
 
         else:
