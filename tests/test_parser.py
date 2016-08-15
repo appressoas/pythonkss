@@ -82,3 +82,59 @@ class ParseTestCase(unittest.TestCase):
     def test_variable(self):
         description = self.css_with_variables.get_section_by_reference('2.2.1').description
         self.assertEqual('The value of $test-variable: "The test variable value"', description)
+
+    def test_example_sanity(self):
+        markup = self.css.get_section_by_reference('1').examples[0]
+        self.assertEqual(
+            '<div>\n'
+            '  An <em>example</em>\n'
+            '</div>',
+            markup.text)
+        self.assertEqual('embedded', markup.type)
+        self.assertEqual('html', markup.syntax)
+        self.assertEqual('', markup.title)
+
+    def test_example_title(self):
+        markup = self.css.get_section_by_reference('1').examples[1]
+        self.assertEqual('The example', markup.title)
+        self.assertEqual('Example here', markup.text)
+
+    def test_example_type_only(self):
+        markup = self.css.get_section_by_reference('1').examples[2]
+        self.assertEqual('Standalone example here', markup.text)
+        self.assertEqual('isolated', markup.type)
+        self.assertEqual('', markup.title)
+
+    def test_example_type_title_and_sytax(self):
+        markup = self.css.get_section_by_reference('1').examples[3]
+        self.assertEqual('Standalone example with everything', markup.text)
+        self.assertEqual('isolated', markup.type)
+        self.assertEqual('css', markup.syntax)
+        self.assertEqual('A title', markup.title)
+
+    def test_markup_sanity(self):
+        markup = self.css.get_section_by_reference('1').markups[0]
+        self.assertEqual(
+            '<div>\n'
+            '  A <em>markup</em>\n'
+            '</div>',
+            markup.text)
+        self.assertEqual('html', markup.syntax)
+        self.assertEqual('', markup.title)
+
+    def test_markup_title(self):
+        markup = self.css.get_section_by_reference('1').markups[1]
+        self.assertEqual('The title', markup.title)
+        self.assertEqual('with title', markup.text)
+
+    def test_markup_syntax(self):
+        markup = self.css.get_section_by_reference('1').markups[2]
+        self.assertEqual('', markup.title)
+        self.assertEqual('css', markup.syntax)
+        self.assertEqual('with syntax', markup.text)
+
+    def test_markup_with_title_and_syntax(self):
+        markup = self.css.get_section_by_reference('1').markups[3]
+        self.assertEqual('The title', markup.title)
+        self.assertEqual('with syntax and title', markup.text)
+        self.assertEqual('css', markup.syntax)

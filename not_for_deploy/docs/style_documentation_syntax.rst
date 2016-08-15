@@ -21,6 +21,8 @@ Format overview
 
     Markup: (followed by the lines of the example)
 
+    Example: (followed by the lines of the example)
+
     Styleguide <reference - I.E.: 2.3>
     */
 
@@ -44,9 +46,14 @@ A full example (using sass):
     :hover: Something about the hover style.
 
     Markup:
-    <button class="button">Default</button>
-    <button class="button button--primary">Primary</button>
-    <button class="button button--secondary">Secondary</button>
+        <button class="button">Default</button>
+        <button class="button button--primary">Primary</button>
+        <button class="button button--secondary">Secondary</button>
+
+    Example:
+        <button class="button">Default</button>
+        <button class="button button--primary">Primary</button>
+        <button class="button button--secondary">Secondary</button>
 
     Styleguide 1.3
     */
@@ -90,38 +97,79 @@ Format specification::
 Markup
 ======
 A markup section is a (typically syntax hilighted) example. You start a markup part
-with ``Markup:`` and any line below that until another ``Markup:`` or a ``Styleguide`` line.
-line is part of the example.
+with ``Markup:`` and any line indented by at least 2 spaces below that line is part of the markup.
 
 Simple exmaple:
 
     Markup:
-    <button class="default">Default button</button>
-    <button class="primary">Primary button</button>
+        <button class="default">Default button</button>
+        <button class="primary">Primary button</button>
 
 
 The default syntax is ``html``, but you can override this with ``Markup: (<syntax>)``
 where ``<syntax>`` is the same as for :ref:`Markdown code blocks <markdown_code_blocks>`.
 Example using scss syntax::
 
-    Markup: (scss)
-    .my-primary-button {
-        @include button-primary();
-    }
+    Markup: {syntax: scss}
+        .my-primary-button {
+            @include button-primary();
+        }
 
 You can also provide a title for your markup parts. This is mostly useful when you
 have multiple markup parts in a section::
 
     Markup: In HTML
-    <button class="default">Default button</button>
-    <button class="primary">Primary button</button>
+        <button class="default">Default button</button>
+        <button class="primary">Primary button</button>
 
-    Markup: (scss) Using the mixins
-    .my-primary-button {
-        @include button-primary();
-        color: red;
-    }
+    Markup: {syntax: scss} Using the mixins
+        .my-primary-button {
+            @include button-primary();
+            color: red;
+        }
 
+
+Example
+=======
+An example is almost the same as a _Markup_, but an example is used when you
+want to have an example that generates an automatic preview. In addition to
+the syntax option shown in the Markup docs above, examples also support
+a _type_ option. The type option supports the following values:
+
+- ``embedded`` (the default): Embed the preview HTML within the styleguide.
+- ``isolated``: Isolated preview typically opened in a new window or iframe
+  with the example code in the body of the page.
+- ``fullpage``: Just like ``isolated``, but the example code is assumed to be
+  a full HTML page.
+
+
+Examples::
+
+    Example:
+
+        <strong>Strong text</strong>
+        <strong class="big">Big and strong</strong>
+
+    Example: {type: isolated} An isolated example
+
+        <nav class="mainnavigation">
+            <a href="#">Page 1</a>
+            <a href="#">Page 2</a>
+        </nav>
+
+    Example: {type: fullpage} A fullpage example
+
+        <html>
+            <head>
+                <script src="/path/to/menu.js"></script>
+            </head>
+            <body>
+                <nav class="menu">
+                    <a href="#">Page 1</a>
+                    <a href="#">Page 2</a>
+                </nav>
+            </body>
+        </html>
 
 
 .. _markdown_format_details:

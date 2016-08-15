@@ -47,12 +47,32 @@ The strong element.
 - **DO NOT** use for headings.
 
 Example:
-<strong>Strong text</strong>
-<strong class="extrastrong">Extra strong text</strong>
+  <div>
+    An <em>example</em>
+  </div>
+
+Example: The example
+  Example here
+
+Example: {type: isolated}
+  Standalone example here
+
+Example: {type: isolated, syntax: css} A title
+  Standalone example with everything
 
 Markup:
-<strong>Strong text</strong>
-<strong class="extrastrong">Extra strong text</strong>
+  <div>
+    A <em>markup</em>
+  </div>
+
+Markup: {syntax: css} The title
+  with title
+
+Markup: {syntax: css}
+  with syntax
+
+Markup: {syntax: css} The title
+  with syntax and title
 
 Styleguide 1
 */

@@ -33,6 +33,7 @@ setup(
         'Pygments',
         'beautifulsoup4',
         'html5lib',
+        'pyyaml'
     ],
     extras_require={
         'tests': [
