@@ -32,3 +32,7 @@ class Example(MarkupExampleBase):
         if exampletype not in self.supported_types:
             raise exceptions.ArgumentStringError('Unsupported example type: {}'.format(exampletype))
         return exampletype
+
+    @property
+    def height(self):
+        return self.argumentdict.get('height', '300px')
