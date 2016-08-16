@@ -21,6 +21,8 @@ class Example(MarkupExampleBase):
 
         The title for the markup block. Can be ``None``.
     """
+
+    #: Supported ``type`` option values.
     supported_types = {'embedded', 'isolated', 'fullpage'}
 
     def __init__(self, text, filename=None, argumentstring=None):
@@ -28,6 +30,13 @@ class Example(MarkupExampleBase):
 
     @property
     def type(self):
+        """
+        Get the value of the ``type`` option, or ``"embedded"`` if it is not specified.
+
+        Raises:
+            pythonkss.exceptions.ArgumentStringError: If the specified ``type``
+                option is not in :obj:`~.Example.supported_types`.
+        """
         exampletype = self.argumentdict.get('type', 'embedded')
         if exampletype not in self.supported_types:
             raise exceptions.ArgumentStringError('Unsupported example type: {}'.format(exampletype))
@@ -35,4 +44,7 @@ class Example(MarkupExampleBase):
 
     @property
     def height(self):
-        return self.argumentdict.get('height', '300px')
+        """
+        Get the value of the ``height`` option, or ``None`` if it is not specified.
+        """
+        return self.argumentdict.get('height', None)
