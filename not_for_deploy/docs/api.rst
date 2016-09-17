@@ -18,15 +18,15 @@ The core API
 .. currentmodule:: pythonkss.modifier
 .. automodule:: pythonkss.modifier
 
+.. currentmodule:: pythonkss.sectiontree
+.. automodule:: pythonkss.sectiontree
+
 
 Utilities used by the core API
 ==============================
 
 .. currentmodule:: pythonkss.markdownformatter
-
 .. automodule:: pythonkss.markdownformatter
 
-
 .. currentmodule:: pythonkss.comment
-
 .. automodule:: pythonkss.comment

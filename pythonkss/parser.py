@@ -158,18 +158,15 @@ class Parser(object):
         """
         return sorted(self.get_sections(referenceprefix=referenceprefix), key=lambda s: s.reference)
 
-    def as_tree(self, referenceprefix=None):
+    def as_tree(self):
         """
         Get sections organized in :class:`pythonkss.sectiontree.SectionTree`.
-
-        Args:
-            referenceprefix: See :meth:`.get_sections`.
 
         Returns:
             pythonkss.sectiontree.SectionTree: The built tree.
         """
         if not hasattr(self, '_built_tree'):
-            self._built_tree = SectionTree(sections=self.iter_sorted_sections(referenceprefix=referenceprefix))
+            self._built_tree = SectionTree(sections=self.iter_sorted_sections())
         return self._built_tree
 
     def get_section_by_reference(self, reference):

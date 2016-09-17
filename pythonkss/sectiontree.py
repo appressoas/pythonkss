@@ -89,6 +89,16 @@ class SectionTreeNode(object):
         return '.'.join(map(str, self.numbered_path_list))
 
     @property
+    def title(self):
+        """
+        Get the section title, falling back to :attr:`.segment_text` capitalized.
+        """
+        if self.section:
+            return self.section.title
+        else:
+            return self.segment_text.capitalize()
+
+    @property
     def sortkey(self):
         """
         Get the sort key for the node within its parent.
