@@ -98,9 +98,32 @@ Reference
 =========
 The reference must be a unique dotted path for the section.
 
+Examples:
+
+.. code-block:: scss
+
+    /* Buttons
+
+    Styleguide buttons
+    */
+
+    /* Primary button
+
+    Styleguide buttons.primary
+    */
+
+
+    /* Default button
+
+    Styleguide buttons.button
+    */
+
+
+Sorting sections
+----------------
 The styleguide is grouped and sorted by the reference. If you want to
 override how a reference is sorted, you can use ``<number>:<text>`` for
-the last part of the reference. E.g.::
+the last part of the reference. E.g.:
 
 .. code-block:: scss
 
@@ -128,27 +151,32 @@ the last part of the reference. E.g.::
     Styleguide buttons.danger
     */
 
-
 The ``<number>:<text>`` format can only be used for the last part of the reference path.
 
+.. note:: You can, alternatively, use numbers instead of text for the reference path,
+    but this is a pain to keep organized in any larger project.
 
-Markup
-======
-A markup section is a (typically syntax hilighted) example. You start a markup part
-with ``Markup:`` and any line indented by at least 2 spaces below that line is part of the markup.
 
-Simple exmaple:
+Example
+=======
+An Earkup section is a (typically syntax hilighted) example. You start an Example part
+with ``Example:`` and any line indented by at least 2 spaces below that line is part of the markup.
 
-    Markup:
+Simple example::
+
+    Example:
         <button class="default">Default button</button>
         <button class="primary">Primary button</button>
 
 
-The default syntax is ``html``, but you can override this with ``Markup: (<syntax>)``
+Example syntax
+--------------
+
+The default syntax is ``html``, but you can override this with ``Example: (<syntax>)``
 where ``<syntax>`` is the same as for :ref:`Markdown code blocks <markdown_code_blocks>`.
 Example using scss syntax::
 
-    Markup: {syntax: scss}
+    Example: {syntax: scss}
         .my-primary-button {
             @include button-primary();
         }
@@ -156,37 +184,31 @@ Example using scss syntax::
 You can also provide a title for your markup parts. This is mostly useful when you
 have multiple markup parts in a section::
 
-    Markup: In HTML
+    Example: In HTML
         <button class="default">Default button</button>
         <button class="primary">Primary button</button>
 
-    Markup: {syntax: scss} Using the mixins
+    Example: {syntax: scss} Using the mixins
         .my-primary-button {
             @include button-primary();
             color: red;
         }
 
 
-Example
-=======
-An example is almost the same as a _Markup_, but an example is used when you
-want to have an example that generates an automatic preview. In addition to
-the syntax option shown in the Markup docs above, examples also support
-a _type_ option. The type option supports the following values:
+Example type
+------------
+
+You can specify a *type* to indicate the type of your example. We recommend
+that all styleguide renderers using pythonkss at least support:
 
 - ``embedded`` (the default): Embed the preview HTML within the styleguide.
 - ``isolated``: Isolated preview typically opened in a new window or iframe
   with the example code in the body of the page.
-- ``fullpage``: Just like ``isolated``, but the example code is assumed to be
-  a full HTML page.
+
+.. - ``fullpage``: Just like ``isolated``, but the example code is assumed to be a full HTML page.
 
 
-Examples::
-
-    Example:
-
-        <strong>Strong text</strong>
-        <strong class="big">Big and strong</strong>
+Using the isolated type::
 
     Example: {type: isolated} An isolated example
 
@@ -195,19 +217,34 @@ Examples::
             <a href="#">Page 2</a>
         </nav>
 
-    Example: {type: fullpage} A fullpage example
 
-        <html>
-            <head>
-                <script src="/path/to/menu.js"></script>
-            </head>
-            <body>
-                <nav class="menu">
-                    <a href="#">Page 1</a>
-                    <a href="#">Page 2</a>
-                </nav>
-            </body>
-        </html>
+Code-only examples and preview-only examples
+--------------------------------------------
+You can control if your example should be shown as:
+
+- A preview.
+- Code only (normally syntax hilighted)
+- Both (the default when syntax is ``html``)
+
+The preview and code options in action::
+
+    Example: With both preview and (syntax hilighted) code
+
+        <h1>This is the primary heading</h1>
+
+    Example: {preview: false} Without preview - code only
+
+        <h1>This is the primary heading</h1>
+
+    Example: {code: false} Without code - preview only
+
+        <h1>This is the primary heading</h1>
+
+    Example: {syntax: css} Syntax other than HTML - preview is off by default!
+
+        .stuff {
+            color: red;
+        }
 
 
 .. _markdown_format_details:
