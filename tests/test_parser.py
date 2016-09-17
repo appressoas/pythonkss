@@ -146,18 +146,53 @@ class ParseTestCase(unittest.TestCase):
     def test_markup_notindented(self):
         self.assertEqual(0, len(self.css.get_section_by_reference('2.1.1').markups))
 
-    # def test_non_numeric_reference(self):
-    #     sections = self.automatic_references.get_sections()
-    #     references = set(section.reference for section in sections)
-    #     self.assertEqual(references, {'4.1', '4.3',
-    #                                   '4.myapp-fancylist', '4.myapp-fancylist.1', '4.myapp-fancylist.2',
-    #                                   '4.myapp-anotherfancylist'})
-    #
-    # def test_non_numeric_numbered_reference(self):
-    #     # sections = self.automatic_references.get_sections()
-    #     for section in self.automatic_references.iter_sorted_sections():
-    #         print(section.reference)
-    #     # references = set(section.numbered_reference for section in sections)
-    #     # self.assertEqual(references, {'4.1', '4.3',
-    #     #                               '4.5', '4.5.1', '4.5.2',
-    #     #                               '4.4'})
+    def test_non_numeric_reference(self):
+        sections = self.automatic_references.get_sections()
+        references = set(section.reference for section in sections)
+        self.assertEqual(references, {
+            'buttons',
+            'buttons.link',
+            'buttons.normal',
+            'buttons.fancy',
+            'lists.fancy.another-fancy-list',
+            'lists.fancy.alternative1',
+            'lists.fancy',
+            'lists.numbered',
+            'lists.fancy.alternative2',
+            'lists.bullet',
+        })
+
+    def test_non_numeric_reference_sorted(self):
+        sections = self.automatic_references.iter_sorted_sections()
+        references = [section.reference for section in sections]
+        self.assertEqual(references, [
+            'buttons',
+            'buttons.fancy',
+            'buttons.link',
+            'buttons.normal',
+            'lists.bullet',
+            'lists.fancy',
+            'lists.fancy.alternative1',
+            'lists.fancy.alternative2',
+            'lists.fancy.another-fancy-list',
+            'lists.numbered',
+        ])
+
+    def test_as_tree(self):
+        tree = self.automatic_references.as_tree()
+        # tree.prettyprint_tree()
+        # for treenode in tree.sorted_all_descendants_flat():
+        #     print(treenode.prettyformat())
+        self.assertEqual(set(tree.children.keys()), {'buttons', 'lists'})
+        self.assertEqual(set(tree['buttons'].children.keys()),
+                         {'fancy', 'link', 'normal'})
+        self.assertEqual(set(tree['lists'].children.keys()),
+                         {'bullet', 'fancy', 'numbered'})
+        self.assertEqual(set(tree['lists']['fancy'].children.keys()),
+                         {'alternative1', 'alternative2', 'another-fancy-list'})
+
+    def test_as_tree_get_node_by_reference(self):
+        tree = self.automatic_references.as_tree()
+        self.assertEqual(
+            tree.get_node_by_reference(reference='lists.numbered').section.title,
+            'Numbered lists.')

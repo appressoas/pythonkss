@@ -317,6 +317,22 @@ class Section(object):
             self.parse()
         return self._reference_segment_list
 
+    def iter_reference_segments_expanded(self):
+        """
+        Iterate over :meth:`.reference_segment_list`, and return the
+        reference of each segment.
+
+        So if the :meth:`.reference` is ``a.b.c``, this will yield:
+
+        - a
+        - a.b
+        - a.b.c
+        """
+        collected = []
+        for segment in self.reference_segment_list:
+            collected.append(segment)
+            yield '.'.join(collected)
+
     @property
     def sortkey(self):
         """
