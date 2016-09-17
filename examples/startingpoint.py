@@ -10,31 +10,37 @@ def generate_styleguide(*paths):
     Uses all the important features, but prints to stdout.
     """
     parser = pythonkss.Parser(*paths)
-    for section in parser.iter_sorted_sections():
+    for node in parser.as_tree().sorted_all_descendants_flat():
         print()
         print('*' * 70)
-        print(section.reference, section.title)
+        if node.section:
+            print(node.section.reference, node.section.title)
+        else:
+            print(node.reference, node.segment_text.capitalize())
         print('*' * 70)
         print()
 
-        for modifier in section.modifiers:
+        if not node.section:
+            continue
+
+        for modifier in node.section.modifiers:
             print('-- ', modifier.name, ' --')
             print(modifier.description_html)
 
-        if section.description:
+        if node.section.description:
             print()
-            print(section.description_html)
+            print(node.section.description_html)
 
-        if section.has_examples() or section.has_markups():
+        if node.section.has_examples() or node.section.has_markups():
             print()
             print('Usage:')
             print('=' * 70)
             print()
-            for example in section.examples:
+            for example in node.section.examples:
                 if example.title:
                     print('-- ', example.title, ' --')
                 print(example.html)
-            for markup in section.markups:
+            for markup in node.section.markups:
                 if markup.title:
                     print('-- ', markup.title, ' --')
                 print(markup.html)
