@@ -269,7 +269,7 @@ class Section(object):
     @property
     def reference(self):
         """
-        Get the raw reference.
+        Get the reference.
 
         This is the part after ``Styleguide`` at the end of the comment.
         If the reference format is ``<number>:<text>``, this is only the ``<text>``.

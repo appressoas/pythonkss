@@ -23,14 +23,13 @@ Format overview
 
     Example: (followed by the lines of the example)
 
-    Styleguide <reference - I.E.: 2.3>
+    Styleguide <reference - I.E.: components.button>
     */
 
 
 A full example (using sass):
 
 .. code-block:: scss
-
 
     /*
     Buttons
@@ -55,7 +54,7 @@ A full example (using sass):
         <button class="button button--primary">Primary</button>
         <button class="button button--secondary">Secondary</button>
 
-    Styleguide 1.3
+    Styleguide components.button
     */
     .button {
         // Your styles here
@@ -92,6 +91,45 @@ A list of modifiers. Any line starting with ``.`` or ``:`` is parsed as docs for
 Format specification::
 
     <.|:><modifier>: <description>
+
+
+
+Reference
+=========
+The reference must be a unique dotted path for the section.
+
+The styleguide is grouped and sorted by the reference. If you want to
+override how a reference is sorted, you can use ``<number>:<text>`` for
+the last part of the reference. E.g.::
+
+.. code-block:: scss
+
+    /* Buttons
+
+    Styleguide 1:buttons
+    */
+
+    /* Primary button
+
+    Styleguide buttons.1:primary
+    */
+
+
+    /* Default button
+
+    Styleguide buttons.2:button
+    */
+
+
+    /* Danger button
+    I do not care how this is sorted. It will be sorted after
+    the explicitly sorted "Primary button" and "Default button".
+
+    Styleguide buttons.danger
+    */
+
+
+The ``<number>:<text>`` format can only be used for the last part of the reference path.
 
 
 Markup
