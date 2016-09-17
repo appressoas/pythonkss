@@ -15,7 +15,7 @@ EXAMPLE_START = 'Example:'
 REFERENCE_START = 'Styleguide'
 
 intented_line_re = re.compile(r'^\s\s+.*$')
-reference_re = re.compile(r'%s ([\d\.]+)' % REFERENCE_START)
+reference_re = re.compile(r'^%s ((?:[0-9a-z_-]*\.)*(?:(?:\d+:)?[0-9a-z_-]+))$' % REFERENCE_START)
 optional_re = re.compile(r'\[(.*)\]\?')
 multiline_modifier_re = re.compile(r'^\s+(\w.*)')
 
@@ -27,7 +27,11 @@ class SectionParser(object):
         self.modifiers = []
         self.markups = []
         self.examples = []
+        self.raw_reference = None
         self.reference = None
+        self.raw_reference_segment_list = []
+        self.reference_segment_list = []
+        self.sortkey = None
 
         self.in_markup = False
         self.in_example = False
@@ -42,6 +46,26 @@ class SectionParser(object):
         self.in_markup = False
         self.in_example = False
         self.in_modifiers = False
+
+    def _parse_last_reference_segment(self, last_reference_segment):
+        sortkey = None
+        if last_reference_segment.isdigit():
+            sortkey = int(last_reference_segment)
+            text = last_reference_segment
+        elif ':' in last_reference_segment:
+            sortkey, text = last_reference_segment.split(':')
+            sortkey = int(sortkey)
+        else:
+            text = last_reference_segment
+        return sortkey, text
+
+    def _parse_raw_reference(self, raw_reference):
+        self.raw_reference = raw_reference
+        if raw_reference:
+            self.raw_reference_segment_list = self.raw_reference.split('.')
+            self.sortkey, text = self._parse_last_reference_segment(self.raw_reference_segment_list[-1])
+            self.reference_segment_list = self.raw_reference_segment_list[0:-1] + [text]
+            self.reference = '.'.join(self.reference_segment_list)
 
     def _parse_modifier_start(self, line):
         self.in_modifiers = True
@@ -63,7 +87,7 @@ class SectionParser(object):
         self._reset_in_booleans()
         match = reference_re.match(line)
         if match:
-            self.reference = match.groups()[0].rstrip('.')
+            self._parse_raw_reference(match.groups()[0])
 
     def _parse_markup_start(self, line):
         if self.markup_lines:
@@ -148,6 +172,10 @@ class Section(object):
         self._description = sectionparser.description
         self._modifiers = sectionparser.modifiers
         self._reference = sectionparser.reference
+        self._raw_reference = sectionparser.raw_reference
+        self._raw_reference_segment_list = sectionparser.raw_reference_segment_list
+        self._reference_segment_list = sectionparser.reference_segment_list
+        self._sortkey = sectionparser.sortkey
         self._markups = []
         self._examples = []
         for lines, argumentstring in sectionparser.markups:
@@ -236,13 +264,84 @@ class Section(object):
     @property
     def reference(self):
         """
-        Get the reference.
+        Get the raw reference.
 
-        This is the part after ``Styleguide:`` at the end of the comment.
+        This is the part after ``Styleguide`` at the end of the comment.
+        If the reference format is ``<number>:<text>``, this is only the ``<text>``.
         """
         if not hasattr(self, '_reference'):
             self.parse()
         return self._reference
+
+    @property
+    def raw_reference(self):
+        """
+        Get the raw reference.
+
+        This is the part after ``Styleguide`` at the end of the comment.
+
+        How a reference is parsed:
+
+        - Split the reference into segments by ``"."``.
+        - All the segments except the last refer to the parent.
+        - The part after the last ``"."`` is in one of the following formats:
+            - ``[a-z0-9_-]+``
+            - ``<number>:<[a-z0-9_-]+>``
+        - All segments except the last can only contain ``[a-z0-9_-]+``.
+        """
+        if not hasattr(self, '_reference'):
+            self.parse()
+        return self._raw_reference
+
+    @property
+    def raw_reference_segment_list(self):
+        """
+        Get :meth:`.raw_reference` as a list of segments.
+
+        Just a shortcut for ``raw_reference.split('.')``, but slightly
+        faster because the list is created when the section is parsed.
+        """
+        if not hasattr(self, '_reference'):
+            self.parse()
+        return self._raw_reference_segment_list
+
+    @property
+    def reference_segment_list(self):
+        """
+        Get :meth:`.reference` as a list of segments.
+
+        Just a shortcut for ``reference.split('.')``, but slightly
+        faster because the list is created when the section is parsed.
+        """
+        if not hasattr(self, '_reference'):
+            self.parse()
+        return self._reference_segment_list
+
+    @property
+    def sortkey(self):
+        """
+        Get the sortkey for this reference within the parent section.
+
+        Parses the last segment of the reference, and extracts a sort key.
+        Extracted as follows:
+
+        - If the segment is a number, return the number.
+        - If the segment starts with ``<number>:``, return the number.
+        - Otherwise, return ``None``.
+
+        See :meth:`.reference` for information about what we mean by "segment".
+
+        Some examples (reference -> sortkey):
+
+        - 1 -> 1
+        - 4.3  -> 3
+        - 4.5.2 -> 2
+        - 4.myapp-lists -> None
+        - 4.12:myapp-lists -> 12
+        """
+        if not hasattr(self, '_reference'):
+            self.parse()
+        return self._sortkey
 
     def _add_markup_linelist(self, markup_lines, **kwargs):
         text = '\n'.join(markup_lines)

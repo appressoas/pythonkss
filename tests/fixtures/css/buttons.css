@@ -12,7 +12,7 @@ Unindented markup.
 Example:
 Unindented markup.
 
-Styleguide 2.1.1.
+Styleguide 2.1.1
 */
 button {
   padding: 5px 15px; }
@@ -34,7 +34,7 @@ A button suitable for giving stars to someone.
 
 The value of $test-variable: {% $test-variable %}
 
-Styleguide 2.2.1.
+Styleguide 2.2.1
 */
 a.button.star {
   display: inline-block; }

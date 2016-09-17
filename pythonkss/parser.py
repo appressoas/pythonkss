@@ -3,6 +3,7 @@ import os
 from pythonkss.comment import CommentParser
 from pythonkss.exceptions import SectionDoesNotExist
 from pythonkss.section import Section
+from pythonkss.sectiontree import SectionTree
 
 
 class Parser(object):
@@ -94,7 +95,6 @@ class Parser(object):
                 section = Section(block, os.path.basename(filename))
                 if section.reference:
                     sections[section.reference] = section
-
         return sections
 
     def find_files(self):
@@ -149,6 +149,9 @@ class Parser(object):
             generator: Iterable of :class:`pythonkss.section.Section` objects.
         """
         return sorted(self.get_sections(referenceprefix=referenceprefix), key=lambda s: s.reference)
+
+    def as_tree(self, referenceprefix=None):
+        return SectionTree(sections=self.iter_sorted_sections(referenceprefix=referenceprefix))
 
     def get_section_by_reference(self, reference):
         """

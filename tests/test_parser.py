@@ -12,6 +12,7 @@ class ParseTestCase(unittest.TestCase):
         self.less = pythonkss.Parser(os.path.join(fixtures, 'less'))
         self.sass = pythonkss.Parser(os.path.join(fixtures, 'sass'))
         self.css = pythonkss.Parser(os.path.join(fixtures, 'css'))
+        self.automatic_references = pythonkss.Parser(os.path.join(fixtures, 'automatic_references'))
         self.css_with_variables = pythonkss.Parser(
             os.path.join(fixtures, 'css'),
             variables={
@@ -144,3 +145,19 @@ class ParseTestCase(unittest.TestCase):
 
     def test_markup_notindented(self):
         self.assertEqual(0, len(self.css.get_section_by_reference('2.1.1').markups))
+
+    # def test_non_numeric_reference(self):
+    #     sections = self.automatic_references.get_sections()
+    #     references = set(section.reference for section in sections)
+    #     self.assertEqual(references, {'4.1', '4.3',
+    #                                   '4.myapp-fancylist', '4.myapp-fancylist.1', '4.myapp-fancylist.2',
+    #                                   '4.myapp-anotherfancylist'})
+    #
+    # def test_non_numeric_numbered_reference(self):
+    #     # sections = self.automatic_references.get_sections()
+    #     for section in self.automatic_references.iter_sorted_sections():
+    #         print(section.reference)
+    #     # references = set(section.numbered_reference for section in sections)
+    #     # self.assertEqual(references, {'4.1', '4.3',
+    #     #                               '4.5', '4.5.1', '4.5.2',
+    #     #                               '4.4'})
