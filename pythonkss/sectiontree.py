@@ -69,9 +69,10 @@ class SectionTreeNode(object):
 
         If this node has no :attr:`.section`, or if the
         sortkey of the section is ``None``, we return
-        a very big number.
+        the :attr:`.segment_text` prefixed with ``"9999"``.
+        If the section has a sortkey, we will return that prefixed with zeroes.
 
-        Will always return a number, so this is well suited
+        Will always return a sortable string, so this is well suited
         for usage in the key function for ``sorted()``.
         """
         if self.section:
@@ -79,9 +80,9 @@ class SectionTreeNode(object):
         else:
             sortkey = None
         if sortkey is None:
-            return 10000000
+            return '9999{}'.format(self.segment_text)
         else:
-            return sortkey
+            return str(sortkey).zfill(4)
 
     def sorted_children(self):
         """
