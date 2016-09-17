@@ -37,6 +37,7 @@ class SectionTreeNode(object):
         self.section = None
         self.level = level
         self.root = root
+        self.numbered_path_list = None
         if self.root:
             self.root.register_node_in_root(node=self)
 
@@ -62,6 +63,31 @@ class SectionTreeNode(object):
                 parent_segments=current_segments,
                 root=root)
 
+    def _sort(self, numbered_path_list=None):
+        """
+        Sort the tree.
+
+        This is called automatically by :meth:`.sorted_children`
+        the first time it is called, so you should not need
+        to call this directly.
+        """
+        self._sorted_children = sorted(self.children.values(), key=lambda node: node.sortkey)
+        self.numbered_path_list = numbered_path_list or []
+        for number, child in enumerate(self._sorted_children, 1):
+            child._sort(
+                numbered_path_list = self.numbered_path_list + [number]
+            )
+
+    @property
+    def dotted_numbered_path(self):
+        """
+        Get the dotted numbered path for this node in sorted order.
+
+        I.E.: If the node is sorted at the third child of the second sorted
+        toplevel node, this will be ``"2.3"``.
+        """
+        return '.'.join(map(str, self.numbered_path_list))
+
     @property
     def sortkey(self):
         """
@@ -84,11 +110,14 @@ class SectionTreeNode(object):
         else:
             return str(sortkey).zfill(4)
 
+    @property
     def sorted_children(self):
         """
         Get children sorted by :meth:`.sortkey`.
         """
-        return sorted(self.children.values(), key=lambda node: node.sortkey)
+        if not hasattr(self, '_sorted_children'):
+            self._sort()
+        return self._sorted_children
 
     def collect_descendants_sorted(self, result):
         """
@@ -101,7 +130,7 @@ class SectionTreeNode(object):
         Args:
             result: A list.
         """
-        for child in self.sorted_children():
+        for child in self.sorted_children:
             result.append(child)
             child.collect_descendants_sorted(result=result)
 
@@ -133,8 +162,9 @@ class SectionTreeNode(object):
             indent = '   ' * self.level
         else:
             indent = ''
-        return '{indent}{segment_text} - level:{level} reference:{reference} ({meta})'.format(
+        return '{indent}{dotted_numbered_path} {segment_text} - level:{level} reference:{reference} ({meta})'.format(
             indent=indent,
+            dotted_numbered_path=self.dotted_numbered_path,
             segment_text=self.segment_text,
             level=self.level,
             reference=self.reference,
@@ -149,7 +179,7 @@ class SectionTreeNode(object):
         """
         if self.segment_text:
             print(self.prettyformat(indent_level=True))
-        for child in self.sorted_children():
+        for child in self.sorted_children:
             child.prettyprint_tree()
 
 
@@ -182,6 +212,7 @@ class SectionTree(SectionTreeNode):
                              parent_segments=[],
                              section=section,
                              root=self)
+        self._sort()
 
     def register_node_in_root(self, node):
         self._all_nodes_map[node.reference] = node

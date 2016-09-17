@@ -160,7 +160,9 @@ class Parser(object):
         Returns:
             pythonkss.sectiontree.SectionTree: The built tree.
         """
-        return SectionTree(sections=self.iter_sorted_sections(referenceprefix=referenceprefix))
+        if not hasattr(self, '_built_tree'):
+            self._built_tree = SectionTree(sections=self.iter_sorted_sections(referenceprefix=referenceprefix))
+        return self._built_tree
 
     def get_section_by_reference(self, reference):
         """

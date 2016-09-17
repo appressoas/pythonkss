@@ -196,3 +196,18 @@ class ParseTestCase(unittest.TestCase):
         self.assertEqual(
             tree.get_node_by_reference(reference='lists.numbered').section.title,
             'Numbered lists.')
+
+    def test_as_tree_sorted_children(self):
+        tree = self.automatic_references.as_tree()
+        # tree.prettyprint_tree()
+        self.assertEqual(set(tree.children.keys()), {'buttons', 'lists'})
+        self.assertEqual(tree.sorted_children[0].segment_text, 'buttons')
+        self.assertEqual(tree.sorted_children[1].segment_text, 'lists')
+        self.assertEqual(tree.sorted_children[1].sorted_children[0].segment_text, 'bullet')
+
+    def test_as_tree_sorted_dotted_numbered_path(self):
+        tree = self.automatic_references.as_tree()
+        self.assertEqual(set(tree.children.keys()), {'buttons', 'lists'})
+        self.assertEqual(tree.sorted_children[0].dotted_numbered_path, '1')
+        self.assertEqual(tree.sorted_children[1].dotted_numbered_path, '2')
+        self.assertEqual(tree.sorted_children[1].sorted_children[2].dotted_numbered_path, '2.3')
