@@ -1,3 +1,4 @@
+import os
 import re
 import textwrap
 
@@ -162,9 +163,13 @@ class Section(object):
     A section in the documentation.
     """
 
-    def __init__(self, comment=None, filename=None):
+    def __init__(self, comment=None, filepath=None):
         self.comment = comment or ''
-        self.filename = filename
+        self.filepath = filepath
+
+    @property
+    def filename(self):
+        return os.path.basename(self.filepath)
 
     def parse(self):
         sectionparser = SectionParser(comment=self.comment)

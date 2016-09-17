@@ -73,7 +73,7 @@ class SectionTestCase(unittest.TestCase):
         if reference:
             commentparts.append('Styleguide {}'.format(reference))
         comment = '\n\n'.join(commentparts)
-        return Section(comment, filename='example.css')
+        return Section(comment, filepath='example.css')
 
     def test_description_html_from_markdown(self):
         self.assertEqual(

@@ -2,31 +2,33 @@ import os
 import unittest
 
 import pythonkss
+from pythonkss.exceptions import DuplicateReferenceError
 
 
 class ParseTestCase(unittest.TestCase):
 
     def setUp(self):
-        fixtures = os.path.join(os.path.dirname(__file__), 'fixtures')
-        self.scss = pythonkss.Parser(os.path.join(fixtures, 'scss'))
-        self.less = pythonkss.Parser(os.path.join(fixtures, 'less'))
-        self.sass = pythonkss.Parser(os.path.join(fixtures, 'sass'))
-        self.css = pythonkss.Parser(os.path.join(fixtures, 'css'))
-        self.automatic_references = pythonkss.Parser(os.path.join(fixtures, 'automatic_references'))
+        self.fixtures_path = os.path.join(os.path.dirname(__file__), 'fixtures')
+        self.scss = pythonkss.Parser(os.path.join(self.fixtures_path, 'scss'))
+        self.less = pythonkss.Parser(os.path.join(self.fixtures_path, 'less'))
+        self.sass = pythonkss.Parser(os.path.join(self.fixtures_path, 'sass'))
+        self.css = pythonkss.Parser(os.path.join(self.fixtures_path, 'css'))
+        self.automatic_references = pythonkss.Parser(os.path.join(self.fixtures_path, 'automatic_references'))
         self.css_with_variables = pythonkss.Parser(
-            os.path.join(fixtures, 'css'),
+            os.path.join(self.fixtures_path, 'css'),
             variables={
                 '$test-variable': '"The test variable value"'
             }
         )
-        self.na = pythonkss.Parser(os.path.join(fixtures, 'scss'), extensions=['.css'])
-        self.multiple = pythonkss.Parser(os.path.join(fixtures, 'scss'), os.path.join(fixtures, 'less'))
+        self.na = pythonkss.Parser(os.path.join(self.fixtures_path, 'scss'), extensions=['.css'])
+        self.multiple = pythonkss.Parser(os.path.join(self.fixtures_path, 'scss'),
+                                         os.path.join(self.fixtures_path, 'less'))
 
     def test_parses_kss_comments_in_scss(self):
         self.assertEqual(self.scss.get_section_by_reference('2.1.1').title, 'Your standard form button.')
 
     def test_parses_kss_comments_in_less(self):
-        self.assertEqual(self.less.get_section_by_reference('2.1.1').title, 'Your standard form button.')
+        self.assertEqual(self.less.get_section_by_reference('3.1.1').title, 'Your standard form button.')
 
     def test_parses_kss_multi_line_comments_in_sass(self):
         self.assertEqual(self.sass.get_section_by_reference('2.1.1').title, 'Your standard form button.')
@@ -43,8 +45,8 @@ class ParseTestCase(unittest.TestCase):
         self.assertEqual(self.scss.get_section_by_reference('3.0.1').title, 'Your standard text input box.')
 
     def test_parses_nested_less_documents(self):
-        self.assertEqual(self.less.get_section_by_reference('3.0.0').title, 'Your standard form element.')
-        self.assertEqual(self.less.get_section_by_reference('3.0.1').title, 'Your standard text input box.')
+        self.assertEqual(self.less.get_section_by_reference('10.0.0').title, 'Your standard form element.')
+        self.assertEqual(self.less.get_section_by_reference('10.0.1').title, 'Your standard text input box.')
 
     def test_parses_nested_sass_documents(self):
         self.assertEqual(self.sass.get_section_by_reference('3.0.0').title, 'Your standard form element.')
@@ -54,7 +56,7 @@ class ParseTestCase(unittest.TestCase):
         self.assertEqual(len(self.css.sections), 3)
 
     def test_parse_multiple_paths(self):
-        self.assertEqual(len(self.multiple.sections), 6)
+        self.assertEqual(len(self.multiple.sections), 10)
 
     def test_parse_ext_mismatch(self):
         self.assertDictEqual(self.na.sections, {})
@@ -211,3 +213,8 @@ class ParseTestCase(unittest.TestCase):
         self.assertEqual(tree.sorted_children[0].dotted_numbered_path, '1')
         self.assertEqual(tree.sorted_children[1].dotted_numbered_path, '2')
         self.assertEqual(tree.sorted_children[1].sorted_children[2].dotted_numbered_path, '2.3')
+
+    def test_duplicate_references(self):
+        parser = pythonkss.Parser(os.path.join(self.fixtures_path, 'duplicate_reference'))
+        with self.assertRaises(DuplicateReferenceError):
+            parser.parse()

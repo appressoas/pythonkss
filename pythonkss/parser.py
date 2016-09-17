@@ -1,7 +1,7 @@
 import os
 
 from pythonkss.comment import CommentParser
-from pythonkss.exceptions import SectionDoesNotExist
+from pythonkss.exceptions import SectionDoesNotExist, DuplicateReferenceError
 from pythonkss.section import Section
 from pythonkss.sectiontree import SectionTree
 
@@ -89,12 +89,20 @@ class Parser(object):
         sections = {}
         variablemap = self._make_variablemap()
 
-        for filename in self.find_files():
-            parser = CommentParser(filename, variablemap=variablemap)
+        for filepath in self.find_files():
+            parser = CommentParser(filepath, variablemap=variablemap)
             for block in parser.blocks:
-                section = Section(block, os.path.basename(filename))
+                section = Section(block, filepath=filepath)
                 if section.reference:
-                    sections[section.reference] = section
+                    if section.reference in sections:
+                        first_defined_section = sections[section.reference]
+                        raise DuplicateReferenceError(
+                            reference=section.reference,
+                            first_defined_section=first_defined_section,
+                            duplicate_section=section
+                        )
+                    else:
+                        sections[section.reference] = section
         return sections
 
     def find_files(self):
