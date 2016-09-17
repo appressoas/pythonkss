@@ -17,11 +17,7 @@ Format overview
 
     description (multiple lines)
 
-    modifiers (described below)
-
-    Markup: (followed by the lines of the example)
-
-    Example: (followed by the lines of the example)
+    Example: (followed by the lines of the example indented by at least 2 spaces)
 
     Styleguide <reference - I.E.: components.button>
     */
@@ -34,20 +30,7 @@ A full example (using sass):
     /*
     Buttons
 
-    We provide several different kinds of buttons:
-
-    - <button class="button">Default</button>
-    - <button class="button button--primary">Primary</button>
-    - <button class="button button--secondary">Secondary</button>
-
-    .button--primary: A primary button.
-    .button--secondary: A secondary button.
-    :hover: Something about the hover style.
-
-    Markup:
-        <button class="button">Default</button>
-        <button class="button button--primary">Primary</button>
-        <button class="button button--secondary">Secondary</button>
+    We provide several different kinds of buttons.
 
     Example:
         <button class="button">Default</button>

@@ -82,10 +82,6 @@ class ParseTestCase(unittest.TestCase):
         self.assertEqual(sorted_sections[0].reference, '2.1.1')
         self.assertEqual(sorted_sections[1].reference, '2.2.1')
 
-    def test_variable(self):
-        description = self.css_with_variables.get_section_by_reference('2.2.1').description
-        self.assertEqual('The value of $test-variable: "The test variable value"', description)
-
     def test_example_sanity(self):
         markup = self.css.get_section_by_reference('1').examples[0]
         self.assertEqual(
@@ -117,36 +113,6 @@ class ParseTestCase(unittest.TestCase):
 
     def test_example_notindented(self):
         self.assertEqual(0, len(self.css.get_section_by_reference('2.1.1').examples))
-
-    def test_markup_sanity(self):
-        markup = self.css.get_section_by_reference('1').markups[0]
-        self.assertEqual(
-            '<div>\n'
-            '  A <em>markup</em>\n'
-            '</div>',
-            markup.text)
-        self.assertEqual('html', markup.syntax)
-        self.assertEqual('', markup.title)
-
-    def test_markup_title(self):
-        markup = self.css.get_section_by_reference('1').markups[1]
-        self.assertEqual('The title', markup.title)
-        self.assertEqual('with title', markup.text)
-
-    def test_markup_syntax(self):
-        markup = self.css.get_section_by_reference('1').markups[2]
-        self.assertEqual('', markup.title)
-        self.assertEqual('css', markup.syntax)
-        self.assertEqual('with syntax', markup.text)
-
-    def test_markup_with_title_and_syntax(self):
-        markup = self.css.get_section_by_reference('1').markups[3]
-        self.assertEqual('The title', markup.title)
-        self.assertEqual('with syntax and title', markup.text)
-        self.assertEqual('css', markup.syntax)
-
-    def test_markup_notindented(self):
-        self.assertEqual(0, len(self.css.get_section_by_reference('2.1.1').markups))
 
     def test_non_numeric_reference(self):
         sections = self.automatic_references.get_sections()
