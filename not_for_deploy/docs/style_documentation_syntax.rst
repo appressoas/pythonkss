@@ -67,16 +67,6 @@ Description is optional. It is written using Markdown.
 See :ref:`markdown_format_details` for details about the markdown format.
 
 
-Modifier
-========
-A list of modifiers. Any line starting with ``.`` or ``:`` is parsed as docs for a modifier.
-
-Format specification::
-
-    <.|:><modifier>: <description>
-
-
-
 Reference
 =========
 The reference must be a unique dotted path for the section.
