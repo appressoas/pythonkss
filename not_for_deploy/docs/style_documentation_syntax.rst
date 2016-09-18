@@ -184,7 +184,6 @@ that all styleguide renderers using pythonkss at least support:
 Using the isolated type::
 
     Example: {type: isolated} An isolated example
-
         <nav class="mainnavigation">
             <a href="#">Page 1</a>
             <a href="#">Page 2</a>
@@ -202,19 +201,15 @@ You can control if your example should be shown as:
 The preview and code options in action::
 
     Example: With both preview and (syntax hilighted) code
-
         <h1>This is the primary heading</h1>
 
     Example: {preview: false} Without preview - code only
-
         <h1>This is the primary heading</h1>
 
     Example: {code: false} Without code - preview only
-
         <h1>This is the primary heading</h1>
 
     Example: {syntax: css} Syntax other than HTML - preview is off by default!
-
         .stuff {
             color: red;
         }
