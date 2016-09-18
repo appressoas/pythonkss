@@ -61,6 +61,14 @@ class ParseTestCase(unittest.TestCase):
     def test_parse_ext_mismatch(self):
         self.assertDictEqual(self.na.sections, {})
 
+    def test_parse_non_styleguide_comments(self):
+        parser = pythonkss.Parser(
+            os.path.join(self.fixtures_path, 'non-styleguide-comments'))
+        sections = list(parser.get_sections())
+        self.assertEqual(len(sections), 1)
+        self.assertEqual(sections[0].reference,
+                         'example.styleguidecomment')
+
     def test_get_sections(self):
         sections = self.css.get_sections()
         references = set(section.reference for section in sections)

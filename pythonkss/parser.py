@@ -2,7 +2,7 @@ import os
 
 from pythonkss.comment import CommentParser
 from pythonkss.exceptions import SectionDoesNotExist, DuplicateReferenceError
-from pythonkss.section import Section
+from pythonkss.section import Section, NotSectionError
 from pythonkss.sectiontree import SectionTree
 
 
@@ -93,7 +93,11 @@ class Parser(object):
             parser = CommentParser(filepath, variablemap=variablemap)
             for block in parser.blocks:
                 section = Section(block, filepath=filepath)
-                if section.reference:
+                try:
+                    section.parse()
+                except NotSectionError:
+                    pass
+                else:
                     if section.reference in sections:
                         first_defined_section = sections[section.reference]
                         raise DuplicateReferenceError(

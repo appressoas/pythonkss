@@ -6,14 +6,18 @@ from pythonkss import markdownformatter
 from pythonkss.example import Example
 
 
-CLASS_MODIFIER = '.'
-PSEUDO_CLASS_MODIFIER = ':'
 EXAMPLE_START = 'Example:'
 REFERENCE_START = 'Styleguide'
 
 intented_line_re = re.compile(r'^\s\s+.*$')
 reference_re = re.compile(r'^%s ((?:[0-9a-z_-]*\.)*(?:(?:\d+:)?[0-9a-z_-]+))$' % REFERENCE_START)
 optional_re = re.compile(r'\[(.*)\]\?')
+
+
+class NotSectionError(ValueError):
+    def __init__(self, message, comment_lines):
+        self.comment_lines = comment_lines
+        super(NotSectionError, self).__init__(message)
 
 
 class SectionParser(object):
@@ -26,6 +30,7 @@ class SectionParser(object):
         self.raw_reference_segment_list = []
         self.reference_segment_list = []
         self.sortkey = None
+        self.description = None
 
         self.in_example = False
         self.description_lines = []
@@ -48,20 +53,6 @@ class SectionParser(object):
             text = last_reference_segment
         return sortkey, text
 
-    def _parse_raw_reference(self, raw_reference):
-        self.raw_reference = raw_reference
-        if raw_reference:
-            self.raw_reference_segment_list = self.raw_reference.split('.')
-            self.sortkey, text = self._parse_last_reference_segment(self.raw_reference_segment_list[-1])
-            self.reference_segment_list = self.raw_reference_segment_list[0:-1] + [text]
-            self.reference = '.'.join(self.reference_segment_list)
-
-    def _parse_reference_start(self, line):
-        self._reset_in_booleans()
-        match = reference_re.match(line)
-        if match:
-            self._parse_raw_reference(match.groups()[0])
-
     def _parse_example_start(self, line):
         if self.example_lines:
             self.examples.append([self.example_lines, self.example_argumentstring])
@@ -79,11 +70,8 @@ class SectionParser(object):
         self._reset_in_booleans()
         self.description_lines.append(line)
 
-    def parse_line(self, line):
-        if line.startswith(REFERENCE_START):
-            self._parse_reference_start(line=line)
-
-        elif line.startswith(EXAMPLE_START):
+    def parse_body_line(self, line):
+        if line.startswith(EXAMPLE_START):
             self._parse_example_start(line=line)
         elif self.in_example is True and (intented_line_re.match(line) or line.strip() == ''):
             self._parse_in_example(line=line)
@@ -91,13 +79,36 @@ class SectionParser(object):
         else:
             self._parse_description(line=line)
 
+    def _parse_title(self, line):
+        self.title = line.strip()
+
+    def _parse_raw_reference(self, raw_reference):
+        self.raw_reference = raw_reference
+        if raw_reference:
+            self.raw_reference_segment_list = self.raw_reference.split('.')
+            self.sortkey, text = self._parse_last_reference_segment(self.raw_reference_segment_list[-1])
+            self.reference_segment_list = self.raw_reference_segment_list[0:-1] + [text]
+            self.reference = '.'.join(self.reference_segment_list)
+
+    def _parse_reference(self, line):
+        match = reference_re.match(line)
+        if match:
+            self._parse_raw_reference(match.groups()[0])
+
     def parse(self):
         lines = self.comment.strip().splitlines()
-        if len(lines) == 0:
-            return
-        self.title = lines[0].strip()
-        for line in lines[1:]:
-            self.parse_line(line=line)
+        if len(lines) < 2:
+            raise NotSectionError('Not a section. A section must have at least 2 lines.',
+                                  comment_lines=lines)
+        self._parse_reference(lines[-1])
+        if self.reference is None:
+            raise NotSectionError('Not a section. A section must have the reference on the last line.',
+                                  comment_lines=lines)
+        self._parse_title(lines[0])
+
+        self._reset_in_booleans()
+        for line in lines[1:-1]:
+            self.parse_body_line(line=line)
         self.description = '\n'.join(self.description_lines).strip()
         if self.example_lines:
             self.examples.append([self.example_lines, self.example_argumentstring])

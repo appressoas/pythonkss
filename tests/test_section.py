@@ -1,6 +1,6 @@
 import unittest
 
-from pythonkss.section import Section
+from pythonkss.section import Section, NotSectionError
 
 
 class SectionSanityTestCase(unittest.TestCase):
@@ -37,7 +37,8 @@ Styleguide 2.1.1
 
     def test_handles_when_no_reference(self):
         section = Section('Styleguide', 'example.css')
-        self.assertEqual(section.reference, None)
+        with self.assertRaises(NotSectionError):
+            section.parse()
 
 
 class SectionTestCase(unittest.TestCase):
