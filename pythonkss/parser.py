@@ -1,3 +1,4 @@
+import fnmatch
 import os
 
 from pythonkss.comment import CommentParser
@@ -174,6 +175,27 @@ class Parser(object):
             *paths: One or more directories to search for style files.
             extensions: List of file extensions to search for.
                 Optional - defaults to ``['.less', '.css', '.sass', '.scss']``.
+            filename_patterns: Optional list of :func:`fnmatch.fnmatchcase` patterns for
+                files to include in the styleguide.
+
+                If this is not provided, all files in the directories specified
+                in ``*paths`` is included.
+
+                If this is provided, it must be a list/iterable of :func:`fnmatch.fnmatchcase`
+                patterns. All file-paths matching any of the patterns in the list is included.
+                Example::
+
+                    filename_patterns=[
+                        '*mytheme/*',
+                        '*external_theme/essentials/*',
+                        '*external_theme/advanced/menu.scss',
+                        '*external_theme/advanced/navbar.scss',
+                    ]
+
+                The check agains filename_patterns is performed after the check for
+                filename extensions (see ``extensions`` kwarg). So if a filename
+                does not match the required extensions, putting it in ``filename_patterns``
+                does not help at all.
             variables (dict): Dict that maps variables to values.
                 Variables can be used anywhere in the comments, and they are
                 applied before any other parsing of the comments.
@@ -191,6 +213,7 @@ class Parser(object):
         """
         self.paths = paths
         self.variables = kwargs.pop('variables', None)
+        self.filename_patterns = kwargs.pop('filename_patterns', None)
         self.variablepattern = kwargs.pop('variablepattern', '{{% {variable} %}}')
         extensions = kwargs.pop('extensions', None)
         if extensions is None:
@@ -206,17 +229,19 @@ class Parser(object):
             variablemap[mapkey] = value
         return variablemap
 
-    def parse(self):
-        variablemap = self._make_variablemap()
-        multiblockparser = MultiCommentBlockParser()
-        for filepath in self.find_files():
-            commentparser = CommentParser(filepath, variablemap=variablemap)
-            for commentblock in commentparser.blocks:
-                multiblockparser.parse_commentblock(
-                    commentblock=commentblock,
-                    filepath=filepath)
-        multiblockparser.finish()
-        return multiblockparser
+    def _has_match_in_filename_patterns(self, filepath):
+        for pattern in self.filename_patterns:
+            if fnmatch.fnmatchcase(filepath, pattern):
+                return True
+        return False
+
+    def should_include_file(self, filepath):
+        if self.filename_patterns is None:
+            return True
+        if self._has_match_in_filename_patterns(filepath):
+            return True
+        else:
+            return False
 
     def find_files(self):
         """
@@ -230,7 +255,21 @@ class Parser(object):
                 for filename in files:
                     (name, ext) = os.path.splitext(filename)
                     if ext in self.extensions:
-                        yield os.path.join(subpath, filename)
+                        filepath = os.path.join(subpath, filename)
+                        if self.should_include_file(filepath):
+                            yield filepath
+
+    def parse(self):
+        variablemap = self._make_variablemap()
+        multiblockparser = MultiCommentBlockParser()
+        for filepath in self.find_files():
+            commentparser = CommentParser(filepath, variablemap=variablemap)
+            for commentblock in commentparser.blocks:
+                multiblockparser.parse_commentblock(
+                    commentblock=commentblock,
+                    filepath=filepath)
+        multiblockparser.finish()
+        return multiblockparser
 
     @property
     def multiblockparser(self):

@@ -6,6 +6,43 @@ from pythonkss.exceptions import DuplicateReferenceError, ExtendReferenceDoesNot
     ReplaceReferenceDoesNotExistError
 
 
+class ParserBasicsTestCase(unittest.TestCase):
+    def __get_fixture_path(self, *path):
+        return os.path.join(os.path.dirname(__file__), 'fixtures', *path)
+
+    def __strip_fixture_path(self, *filenames):
+        stripped_filenames = []
+        for filename in filenames:
+            stripped_filename = filename[len(self.__get_fixture_path()) + 1:]
+            stripped_filenames.append(stripped_filename)
+        return stripped_filenames
+
+    def test_find_files_without_filename_patterns(self):
+        parser = pythonkss.Parser(self.__get_fixture_path('find_files'))
+        filenames = self.__strip_fixture_path(*parser.find_files())
+        self.assertEqual(set(filenames), {
+            'find_files/buttons.css',
+            'find_files/forms.css',
+            'find_files/advanced/menu.css',
+            'find_files/advanced/form-inputs.css',
+            'find_files/advanced/form-buttons.css',
+        })
+
+    def test_find_files_with_filename_patterns(self):
+        parser = pythonkss.Parser(
+            self.__get_fixture_path('find_files'),
+            filename_patterns=[
+                '*find_files/buttons.css',
+                '*advanced/form-*'
+            ])
+        filenames = self.__strip_fixture_path(*parser.find_files())
+        self.assertEqual(set(filenames), {
+            'find_files/buttons.css',
+            'find_files/advanced/form-inputs.css',
+            'find_files/advanced/form-buttons.css',
+        })
+
+
 class ParseTestCase(unittest.TestCase):
 
     def setUp(self):
