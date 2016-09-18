@@ -422,3 +422,228 @@ We use the [Markdown](http://pythonhosted.org/Markdown/) library with the follow
 - [fenced_code](http://pythonhosted.org/Markdown/extensions/fenced_code_blocks.html)
 
 Each of these extensions have extensive docs if you want to know more.
+
+
+*****************************
+Extending styleguide sections
+*****************************
+Lets say you are using a base theme, and you want to:
+
+- Add some text to some of the sections in the base theme.
+- Replace some of the sections with your own docs.
+
+We actually provide 4 section types:
+
+- **Styleguide**: The base docs for a section. As seen in all the examples previously in this guide.
+- **StyleguideExtendBefore**: Extend the docs of a section adding the new docs *before* existing docs.
+- **StyleguideExtendAfter**: Extend the docs of a section adding the new docs *after* existing docs.
+- **StyleguideReplace**: Replace the docs for a section.
+
+
+StyleguideExtendBefore and StyleguideExtendAfter
+================================================
+Any section using one of these section types will be merged with the base
+docs for the section. This means that any:
+
+- title
+- description
+- example
+
+will be added before or after the original base docs for the section. They are merged as follows:
+
+- Any title is added before or after the original title. The orignal and the
+  added content is separated by a single space.
+- Any description is added before or after the original description. The orignal and the
+  added content is separated by two newline characters.
+- Any examples is added before or after the original examples. Examples
+  is a list, so for examples we just insert to the beginning or append to the
+  end of the list.
+
+Titles must be marked with ``Title: <new title here>``. This is bacause
+the parser must have some way of knowing if you are overriding a description
+or a title. Titles must still be on the first non-empty line of the comment.
+
+
+Basic example
+-------------
+
+The following:
+
+.. code-block:: scss
+
+    /*
+    Buttons
+
+    We provide several different kinds of buttons.
+
+    Example:
+        <button class="button">Default</button>
+
+    Styleguide components.button
+    */
+
+
+    /*
+    Some extra description added after the original description!
+
+    Example:
+        <button class="button">An extra example added after the original example</button>
+
+    Example:
+        <button class="button">Another extra example added after the original example</button>
+
+    StyleguideExtendAfter components.button
+    */
+
+
+    /*
+    Some extra description added before the original description!
+
+    Example:
+        <button class="button">An extra example added before the original example</button>
+
+    StyleguideExtendBefore components.button
+    */
+
+Will result in the ``components.button`` section ending up with the following content:
+
+.. code-block:: scss
+
+    /*
+    Buttons
+
+    Some extra description added before the original description!
+
+    We provide several different kinds of buttons.
+
+    Some extra description added after the original description!
+
+    Example:
+        <button class="button">An extra example added before the original example</button>
+
+    Example:
+        <button class="button">Default</button>
+
+    Example:
+        <button class="button">An extra example added after the original example</button>
+
+    Example:
+        <button class="button">Another extra example added after the original example</button>
+
+    Styleguide components.button
+    */
+
+
+Adding a prefix and suffix to the title
+---------------------------------------
+
+The following:
+
+.. code-block:: scss
+
+    /*
+    Buttons
+
+    We provide several different kinds of buttons.
+
+    Example:
+        <button class="button">Default</button>
+
+    Styleguide components.button
+    */
+
+
+    /*
+    Title: DEPRECATED
+
+    StyleguideExtendAfter components.button
+    */
+
+
+    /*
+    Title: (do not use for new code)
+
+    StyleguideExtendAfter components.button
+    */
+
+
+Will result in the ``components.button`` section ending up with the following content:
+
+.. code-block:: scss
+
+    /*
+    DEPRECATED Buttons (do not use for new code)
+
+    We provide several different kinds of buttons.
+
+    Example:
+        <button class="button">Default</button>
+
+    Styleguide components.button
+    */
+
+
+
+StyleguideReplace
+=================
+A section of this type will replace any base section.
+
+The following:
+
+.. code-block:: scss
+
+    /*
+    Buttons
+
+    We provide several different kinds of buttons.
+
+    Example:
+        <button class="button">Default</button>
+
+    Styleguide components.button
+    */
+
+    /*
+    Our buttons
+
+    They are very cool.
+
+    StyleguideReplace components.button
+    */
+
+Will result in the ``Styleguide components.button`` section beeing
+replaced by the ``StyleguideReplace components.button`` section.
+So the original will not be included in the style guide.
+
+
+Parse order for extending styleguide sections
+=============================================
+To understand this, you need to understand about styleguide parse order:
+
+    The styleguide parser gets one or more directories as input.
+    If you only use one directory, you should not be messing around
+    with extending at all because order can only be guaranteed
+    per directory.
+
+    If you provide multiple directories, they are parsed in the provided order.
+    This means that all files in the first directory is parsed before
+    parsing the second directory (and so on).
+
+    So if you are extending a base theme, the base theme should be the first
+    directory parsed, and your custom/extended styles should be last.
+
+So with this in mind, you should be able to understand the rules when
+extending styleguide sections:
+
+- The last StyleguideReplace will replace any section with the same reference.
+  If you have multiple StyleguideReplace, the last one will be used and
+  all others is ignored.
+- StyleguideReplace will ignore any StyleguideExtendBefore and StyleguideExtendAfter
+  sections.
+- The merge of StyleguideExtendBefore and StyleguideExtendAfter into normal sections
+  is handled after all sections have been processed, so their order only matter
+  in relation to other StyleguideExtendBefore and StyleguideExtendAfter. They are
+  applied in the provided order. So if you have 3 directories of styles,
+  with directory 2 and directory 3 both adding a StyleguideExtendAfter for the same
+  section, the content from directory 2 is merged in first, and the content from directory
+  3 is mergen in last.

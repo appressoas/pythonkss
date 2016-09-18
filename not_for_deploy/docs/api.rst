@@ -12,11 +12,8 @@ The core API
 .. currentmodule:: pythonkss.section
 .. automodule:: pythonkss.section
 
-.. currentmodule:: pythonkss.markup
-.. automodule:: pythonkss.markup
-
-.. currentmodule:: pythonkss.modifier
-.. automodule:: pythonkss.modifier
+.. currentmodule:: pythonkss.example
+.. automodule:: pythonkss.example
 
 .. currentmodule:: pythonkss.sectiontree
 .. automodule:: pythonkss.sectiontree

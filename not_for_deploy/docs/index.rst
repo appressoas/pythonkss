@@ -4,7 +4,7 @@ Welcome to PythonKSS's documentation!
 This is a library for parsing the KSS format (with some extra formatting sugar).
 
 If you are looking for a way to render the styleguide, write your own using
-`https://github.com/appressoas/pythonkss/blob/master/examples/startingpoint.py`_
+https://github.com/appressoas/pythonkss/blob/master/examples/startingpoint.py
 as a starting point.
 
 Install
