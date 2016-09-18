@@ -4,7 +4,7 @@ import textwrap
 
 from pythonkss import markdownformatter
 from pythonkss.example import Example
-
+from pythonkss.exceptions import NotSectionError, InvalidMergeSectionTypeError, InvalidMergeNotSameReferenceError
 
 EXAMPLE_START = 'Example:'
 
@@ -13,20 +13,6 @@ reference_re = re.compile(
     r'^Styleguide(?P<type>(?:ExtendBefore|ExtendAfter|Replace))? '
     r'(?P<reference>(?:[0-9a-z_-]*\.)*(?:(?:\d+:)?[0-9a-z_-]+))$')
 extend_title_re = re.compile(r'Title:(?P<title>.+)$')
-
-
-class NotSectionError(ValueError):
-    def __init__(self, message, comment_lines):
-        self.comment_lines = comment_lines
-        super(NotSectionError, self).__init__(message)
-
-
-class InvalidMergeSectionTypeError(Exception):
-    pass
-
-
-class InvalidMergeNotSameReferenceError(Exception):
-    pass
 
 
 class SectionParser(object):

@@ -2,8 +2,8 @@ import os
 
 from pythonkss.comment import CommentParser
 from pythonkss.exceptions import SectionDoesNotExist, DuplicateReferenceError, ExtendReferenceDoesNotExistError, \
-    ReplaceReferenceDoesNotExistError
-from pythonkss.section import Section, NotSectionError
+    ReplaceReferenceDoesNotExistError, NotSectionError
+from pythonkss.section import Section
 from pythonkss.sectiontree import SectionTree
 
 

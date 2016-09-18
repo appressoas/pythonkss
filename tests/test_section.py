@@ -1,6 +1,7 @@
 import unittest
 
-from pythonkss.section import Section, NotSectionError, InvalidMergeSectionTypeError, InvalidMergeNotSameReferenceError
+from pythonkss.section import Section
+from pythonkss.exceptions import NotSectionError, InvalidMergeSectionTypeError, InvalidMergeNotSameReferenceError
 
 
 class SectionSanityTestCase(unittest.TestCase):

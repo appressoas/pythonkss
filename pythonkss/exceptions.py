@@ -29,3 +29,21 @@ class ExtendReferenceDoesNotExistError(ParserError):
 
 class ReplaceReferenceDoesNotExistError(ParserError):
     pass
+
+
+class SectionParserError(ParserError):
+    pass
+
+
+class NotSectionError(SectionParserError):
+    def __init__(self, message, comment_lines):
+        self.comment_lines = comment_lines
+        super(NotSectionError, self).__init__(message)
+
+
+class InvalidMergeSectionTypeError(SectionParserError):
+    pass
+
+
+class InvalidMergeNotSameReferenceError(SectionParserError):
+    pass
