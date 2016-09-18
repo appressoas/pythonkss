@@ -1,0 +1,38 @@
+/* Replaced Strong title
+
+The replaced description.
+
+Example:
+
+    <strong>Replaced example</strong>
+
+StyleguideReplace replace.strong
+*/
+
+
+/* The rest should be replaced because of the StyleguideReplace above. */
+
+/* Strong
+
+The description.
+
+Example:
+
+    <strong>Example</strong>
+
+Styleguide replace.strong
+*/
+
+
+/*
+Title: title prefix
+
+StyleguideExtendBefore replace.strong
+*/
+
+
+/*
+Title: title suffix
+
+StyleguideExtendAfter replace.strong
+*/

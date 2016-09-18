@@ -1,6 +1,6 @@
 import unittest
 
-from pythonkss.section import Section, NotSectionError
+from pythonkss.section import Section, NotSectionError, InvalidMergeSectionTypeError, InvalidMergeNotSameReferenceError
 
 
 class SectionSanityTestCase(unittest.TestCase):
@@ -88,6 +88,76 @@ class SectionTestCase(unittest.TestCase):
         self.assertEqual(section.title, 'Provided title')
         self.assertEqual(section.description, 'The description')
 
+    def test_parse_type_extend_after_title_sanity(self):
+        comment = 'Title: The title\nStyleguideExtendAfter a.b'
+        section = Section(comment)
+        section.parse()
+        self.assertEqual(section.reference, 'a.b')
+        self.assertEqual(section.title, 'The title')
+        self.assertEqual(section.description, '')
+
+    def test_parse_type_extend_after_title_empty(self):
+        comment = 'Title: \nStyleguideExtendAfter a.b'
+        section = Section(comment)
+        section.parse()
+        self.assertEqual(section.reference, 'a.b')
+        self.assertEqual(section.title, None)
+        self.assertEqual(section.description, 'Title:')
+
+    def test_parse_type_extend_after_title_and_description(self):
+        comment = 'Title: The title\nThe description\nStyleguideExtendAfter a.b'
+        section = Section(comment)
+        section.parse()
+        self.assertEqual(section.reference, 'a.b')
+        self.assertEqual(section.title, 'The title')
+        self.assertEqual(section.description, 'The description')
+
+    def test_parse_type_extend_before_title_sanity(self):
+        comment = 'Title: The title\nStyleguideExtendBefore a.b'
+        section = Section(comment)
+        section.parse()
+        self.assertEqual(section.reference, 'a.b')
+        self.assertEqual(section.title, 'The title')
+        self.assertEqual(section.description, '')
+
+    def test_parse_type_extend_before_title_empty(self):
+        comment = 'Title: \nStyleguideExtendBefore a.b'
+        section = Section(comment)
+        section.parse()
+        self.assertEqual(section.reference, 'a.b')
+        self.assertEqual(section.title, None)
+        self.assertEqual(section.description, 'Title:')
+
+    def test_parse_type_extend_before_title_and_description(self):
+        comment = 'Title: The title\nThe description\nStyleguideExtendBefore a.b'
+        section = Section(comment)
+        section.parse()
+        self.assertEqual(section.reference, 'a.b')
+        self.assertEqual(section.title, 'The title')
+        self.assertEqual(section.description, 'The description')
+
+    def test_parse_type_replace_title_sanity(self):
+        comment = 'The title\nStyleguideReplace a.b'
+        section = Section(comment)
+        section.parse()
+        self.assertEqual(section.reference, 'a.b')
+        self.assertEqual(section.title, 'The title')
+        self.assertEqual(section.description, '')
+
+    def test_parse_type_replace_title_empty(self):
+        comment = 'StyleguideReplace a.b'
+        section = Section(comment)
+        with self.assertRaises(NotSectionError):
+            section.parse()
+
+    def test_parse_type_replace_title_and_description(self):
+        comment = 'The title\nThe description\nStyleguideReplace a.b'
+        section = Section(comment)
+        section.parse()
+        self.assertEqual(section.reference, 'a.b')
+        self.assertEqual(section.title, 'The title')
+        self.assertEqual(section.description, 'The description')
+
     def test_description_html_from_markdown(self):
         self.assertEqual(
             '<p>\n   Hello\n  </p>',
@@ -152,3 +222,120 @@ class SectionTestCase(unittest.TestCase):
         self.assertEqual(
             10,
             self.__make_section(reference='1.3.10:hello').sortkey)
+
+    def test_merge_into_section_invalid_section_type(self):
+        target = Section('The title\nStyleguide a.b')
+        target.parse()
+        source = Section('Title suffix\nStyleguide a.b')
+        source.parse()
+        with self.assertRaises(InvalidMergeSectionTypeError):
+            source.merge_into_section(target_section=target)
+
+    def test_merge_into_section_not_same_reference(self):
+        target = Section('The title\n'
+                         'Styleguide a.b')
+        target.parse()
+        source = Section('Title suffix\n'
+                         'StyleguideExtendBefore a.c')
+        source.parse()
+        with self.assertRaises(InvalidMergeNotSameReferenceError):
+            source.merge_into_section(target_section=target)
+
+    def test_merge_into_section_after_sanity(self):
+        target = Section('The title\n'
+                         'The description\n'
+                         'Styleguide a.b')
+        target.parse()
+        source = Section('Title: Title suffix\n'
+                         'Extra description\n'
+                         'StyleguideExtendAfter a.b')
+        source.parse()
+        source.merge_into_section(target_section=target)
+        self.assertEqual(target.reference, 'a.b')
+        self.assertEqual(target.title, 'The title Title suffix')
+        self.assertEqual(target.description,
+                         'The description\n\nExtra description')
+
+    def test_merge_into_section_after_no_title(self):
+        target = Section('The title\n'
+                         'The description\n'
+                         'Styleguide a.b')
+        target.parse()
+        source = Section('Extra description\n'
+                         'StyleguideExtendAfter a.b')
+        source.parse()
+        source.merge_into_section(target_section=target)
+        self.assertEqual(target.title, 'The title')
+        self.assertEqual(target.description,
+                         'The description\n\nExtra description')
+
+    def test_merge_into_section_after_example(self):
+        target = Section('The title\n'
+                         'Example:\n  <em>example</em>\n'
+                         'Styleguide a.b')
+        target.parse()
+        source = Section('Example:\n  <em>example2</em>\n'
+                         'StyleguideExtendAfter a.b')
+        source.parse()
+        source.merge_into_section(target_section=target)
+        self.assertEqual(target.examples[0].text, '<em>example</em>')
+        self.assertEqual(target.examples[1].text, '<em>example2</em>')
+
+    def test_merge_into_section_after_multiple_examples(self):
+        target = Section('The title\nExample:\n  <em>example</em>\nStyleguide a.b')
+        target.parse()
+        source = Section('Example:\n  <em>example2</em>\n'
+                         'Example:\n  <em>example3</em>\n'
+                         'StyleguideExtendAfter a.b')
+        source.parse()
+        source.merge_into_section(target_section=target)
+        self.assertEqual(target.examples[0].text, '<em>example</em>')
+        self.assertEqual(target.examples[1].text, '<em>example2</em>')
+        self.assertEqual(target.examples[2].text, '<em>example3</em>')
+
+    def test_merge_into_section_before_sanity(self):
+        target = Section('The title\n'
+                         'The description\n'
+                         'Styleguide a.b')
+        target.parse()
+        source = Section('Title: Title prefix\n'
+                         'Extra description\n'
+                         'StyleguideExtendBefore a.b')
+        source.parse()
+        source.merge_into_section(target_section=target)
+        self.assertEqual(target.reference, 'a.b')
+        self.assertEqual(target.title, 'Title prefix The title')
+        self.assertEqual(target.description, 'Extra description\n\nThe description')
+
+    def test_merge_into_section_before_no_title(self):
+        target = Section('The title\nThe description\nStyleguide a.b')
+        target.parse()
+        source = Section('Extra description\nStyleguideExtendBefore a.b')
+        source.parse()
+        source.merge_into_section(target_section=target)
+        self.assertEqual(target.title, 'The title')
+        self.assertEqual(target.description, 'Extra description\n\nThe description')
+
+    def test_merge_into_section_before_example(self):
+        target = Section('The title\n'
+                         'Example:\n  <em>example</em>\n'
+                         'Styleguide a.b')
+        target.parse()
+        source = Section('Example:\n  <em>example2</em>\n'
+                         'StyleguideExtendBefore a.b')
+        source.parse()
+        source.merge_into_section(target_section=target)
+        self.assertEqual(target.examples[0].text, '<em>example2</em>')
+        self.assertEqual(target.examples[1].text, '<em>example</em>')
+
+    def test_merge_into_section_before_multiple_examples(self):
+        target = Section('The title\nExample:\n  <em>example</em>\nStyleguide a.b')
+        target.parse()
+        source = Section('Example:\n  <em>example2</em>\n'
+                         'Example:\n  <em>example3</em>\n'
+                         'StyleguideExtendBefore a.b')
+        source.parse()
+        source.merge_into_section(target_section=target)
+        self.assertEqual(target.examples[0].text, '<em>example2</em>')
+        self.assertEqual(target.examples[1].text, '<em>example3</em>')
+        self.assertEqual(target.examples[2].text, '<em>example</em>')

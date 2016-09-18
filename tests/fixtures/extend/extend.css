@@ -1,0 +1,34 @@
+/* Strong
+
+The description.
+
+Example:
+
+    <strong>Example</strong>
+
+Styleguide extend.strong
+*/
+
+
+/*
+Title: title prefix
+
+Extra description before.
+
+Example:
+    <strong>Extra example before</strong>
+
+StyleguideExtendBefore extend.strong
+*/
+
+
+/*
+Title: title suffix
+
+Extra description after.
+
+Example:
+    <strong>Extra example after</strong>
+
+StyleguideExtendAfter extend.strong
+*/

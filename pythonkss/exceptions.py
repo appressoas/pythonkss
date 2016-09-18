@@ -1,8 +1,12 @@
-class SectionDoesNotExist(Exception):
+class ParserError(Exception):
     pass
 
 
-class DuplicateReferenceError(Exception):
+class SectionDoesNotExist(ParserError):
+    pass
+
+
+class DuplicateReferenceError(ParserError):
     def __init__(self, reference, first_defined_section, duplicate_section):
         self.reference = reference
         self.first_defined_section = first_defined_section
@@ -15,5 +19,13 @@ class DuplicateReferenceError(Exception):
         super(DuplicateReferenceError, self).__init__(message)
 
 
-class ArgumentStringError(Exception):
+class ArgumentStringError(ParserError):
+    pass
+
+
+class ExtendReferenceDoesNotExistError(ParserError):
+    pass
+
+
+class ReplaceReferenceDoesNotExistError(ParserError):
     pass

@@ -7,11 +7,12 @@ from pythonkss.example import Example
 
 
 EXAMPLE_START = 'Example:'
-REFERENCE_START = 'Styleguide'
 
 intented_line_re = re.compile(r'^\s\s+.*$')
-reference_re = re.compile(r'^%s ((?:[0-9a-z_-]*\.)*(?:(?:\d+:)?[0-9a-z_-]+))$' % REFERENCE_START)
-optional_re = re.compile(r'\[(.*)\]\?')
+reference_re = re.compile(
+    r'^Styleguide(?P<type>(?:ExtendBefore|ExtendAfter|Replace))? '
+    r'(?P<reference>(?:[0-9a-z_-]*\.)*(?:(?:\d+:)?[0-9a-z_-]+))$')
+extend_title_re = re.compile(r'Title:(?P<title>.+)$')
 
 
 class NotSectionError(ValueError):
@@ -20,10 +21,19 @@ class NotSectionError(ValueError):
         super(NotSectionError, self).__init__(message)
 
 
+class InvalidMergeSectionTypeError(Exception):
+    pass
+
+
+class InvalidMergeNotSameReferenceError(Exception):
+    pass
+
+
 class SectionParser(object):
     def __init__(self, comment):
         self.comment = comment
         self.title = None
+        self.section_type = None
         self.examples = []
         self.raw_reference = None
         self.reference = None
@@ -78,8 +88,25 @@ class SectionParser(object):
         else:
             self._parse_description(line=line)
 
+    def _parse_extend_title(self, line):
+        match = extend_title_re.match(line)
+        if match:
+            return match.groupdict()['title'].strip()
+        else:
+            return None
+
     def _parse_title(self, line):
-        self.title = line.strip()
+        title_line_consumed = False
+        line = line.strip()
+        if self.section_type in Section.EXTEND_TYPES:
+            title = self._parse_extend_title(line)
+            if title:
+                self.title = title
+                title_line_consumed = True
+        else:
+            self.title = line
+            title_line_consumed = True
+        return title_line_consumed
 
     def _parse_raw_reference(self, raw_reference):
         self.raw_reference = raw_reference
@@ -92,7 +119,9 @@ class SectionParser(object):
     def _parse_styleguide_line(self, line):
         match = reference_re.match(line)
         if match:
-            self._parse_raw_reference(match.groups()[0])
+            groupdict = match.groupdict()
+            self.section_type = groupdict['type'] or Section.TYPE_DEFAULT
+            self._parse_raw_reference(groupdict['reference'])
 
     def parse(self, reference=None, title=None):
         """
@@ -126,8 +155,9 @@ class SectionParser(object):
         if title:
             self._parse_title(title)
         else:
-            self._parse_title(lines[0])
-            lines = lines[1:]
+            title_line_consumed = self._parse_title(lines[0])
+            if title_line_consumed:
+                lines = lines[1:]
 
         self._reset_in_booleans()
         for line in lines:
@@ -141,14 +171,23 @@ class Section(object):
     """
     A section in the documentation.
     """
+    TYPE_DEFAULT = 'Default'
+    TYPE_EXTEND_AFTER = 'ExtendAfter'
+    TYPE_EXTEND_BEFORE = 'ExtendBefore'
+    EXTEND_TYPES = {TYPE_EXTEND_BEFORE, TYPE_EXTEND_AFTER}
+    TYPE_REPLACE = 'Replace'
 
     def __init__(self, comment=None, filepath=None):
         self.comment = comment or ''
         self.filepath = filepath
+        self._parsed = False
 
     @property
     def filename(self):
-        return os.path.basename(self.filepath)
+        if self.filepath:
+            return os.path.basename(self.filepath)
+        else:
+            return self.filepath
 
     def parse(self, **kwargs):
         """
@@ -159,6 +198,7 @@ class Section(object):
         """
         sectionparser = SectionParser(comment=self.comment)
         sectionparser.parse(**kwargs)
+        self._section_type = sectionparser.section_type
         self._title = sectionparser.title
         self._description = sectionparser.description
         self._reference = sectionparser.reference
@@ -169,6 +209,28 @@ class Section(object):
         self._examples = []
         for lines, argumentstring in sectionparser.examples:
             self._add_example_linelist(example_lines=lines, argumentstring=argumentstring)
+
+    def parse_if_needed(self):
+        if not self._parsed:
+            self.parse()
+
+    @property
+    def section_type(self):
+        """
+        Get the title (the first line of the comment).
+        """
+        if not hasattr(self, '_section_type'):
+            self.parse()
+        return self._section_type
+
+    @property
+    def title(self):
+        """
+        Get the title (the first line of the comment).
+        """
+        if not hasattr(self, '_title'):
+            self.parse()
+        return self._title
 
     @property
     def title(self):
@@ -333,3 +395,49 @@ class Section(object):
             filename=self.filename,
             **kwargs)
         self._examples.append(example)
+
+    def _merge_title_into_section(self, target_section, after):
+        if after:
+            formattingstring = '{target} {source}'
+        else:
+            formattingstring = '{source} {target}'
+        target_section._title = formattingstring.format(
+            source=self.title,
+            target=target_section.title)
+
+    def _merge_description_into_section(self, target_section, after):
+        if after:
+            formattingstring = '{target}\n\n{source}'
+        else:
+            formattingstring = '{source}\n\n{target}'
+        target_section._description = formattingstring.format(
+            source=self.description,
+            target=target_section.description)
+
+    def _merge_examples_into_section(self, target_section, after):
+        if after:
+            target_section._examples.extend(self._examples)
+        else:
+            target_section._examples = self._examples + target_section._examples
+
+    def merge_into_section(self, target_section):
+        if self.section_type not in self.EXTEND_TYPES:
+            raise InvalidMergeSectionTypeError(
+                'Can only merge sections of the following types '
+                'into other sections: {extend_types}'.format(
+                    extend_types=', '.join(self.EXTEND_TYPES)
+                ))
+        elif self.reference != target_section.reference:
+            raise InvalidMergeNotSameReferenceError(
+                'Can only merge sections with the same reference.'
+                'Trying to merge {source} into {target}'.format(
+                    source=self.reference,
+                    target=target_section.reference
+                ))
+        after = self.section_type == self.TYPE_EXTEND_AFTER
+        if self.title:
+            self._merge_title_into_section(target_section=target_section, after=after)
+        if self.description:
+            self._merge_description_into_section(target_section=target_section, after=after)
+        if self.examples:
+            self._merge_examples_into_section(target_section=target_section, after=after)

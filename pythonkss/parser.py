@@ -1,9 +1,130 @@
 import os
 
 from pythonkss.comment import CommentParser
-from pythonkss.exceptions import SectionDoesNotExist, DuplicateReferenceError
+from pythonkss.exceptions import SectionDoesNotExist, DuplicateReferenceError, ExtendReferenceDoesNotExistError, \
+    ReplaceReferenceDoesNotExistError
 from pythonkss.section import Section, NotSectionError
 from pythonkss.sectiontree import SectionTree
+
+
+class MultiCommentBlockParser(object):
+    def __init__(self):
+        self._finished = False
+        self._sections = {}
+        self._extend_sections_map = {}
+        self._replace_sections_map = {}
+
+        # For debugging
+        self._ignored_extend_sections = []
+        self._replaced_sections = []
+
+    def _add_section_to_list_in_dict(self, dct, section):
+        if section.reference not in dct:
+            dct[section.reference] = []
+        dct[section.reference].append(section)
+
+    def _add_section_type_extend(self, section):
+        self._add_section_to_list_in_dict(
+            dct=self._extend_sections_map,
+            section=section
+        )
+
+    def _add_section_type_replace(self, section):
+        self._add_section_to_list_in_dict(
+            dct=self._replace_sections_map,
+            section=section
+        )
+
+    def _add_section_type_default(self, section):
+        if section.reference in self._sections:
+            first_defined_section = self._sections[section.reference]
+            raise DuplicateReferenceError(
+                reference=section.reference,
+                first_defined_section=first_defined_section,
+                duplicate_section=section
+            )
+        else:
+            self._sections[section.reference] = section
+
+    def _add_section(self, section):
+        if section.section_type == Section.TYPE_DEFAULT:
+            self._add_section_type_default(section)
+        elif section.section_type in Section.EXTEND_TYPES:
+            self._add_section_type_extend(section)
+        elif section.section_type == Section.TYPE_REPLACE:
+            self._add_section_type_replace(section)
+
+    def parse_commentblock(self, commentblock, filepath):
+        section = Section(commentblock, filepath=filepath)
+        try:
+            section.parse()
+        except NotSectionError:
+            pass
+        else:
+            self._add_section(section)
+
+    def _replace_sections(self):
+        for reference, sections in self._replace_sections_map.items():
+            if reference in self._sections:
+                self._replaced_sections.append(
+                    self._sections.pop(reference))
+                if reference in self._extend_sections_map:
+                    self._ignored_extend_sections.extend(
+                        self._extend_sections_map.pop(reference))
+                self._sections[reference] = sections[-1]
+            else:
+                raise ReplaceReferenceDoesNotExistError(
+                    'Invalid "StyleguideReplace {reference}". '
+                    'No normal section with this reference exists. '
+                    'In file: {filepath}.'.format(
+                        reference=reference,
+                        filepath=sections[0].filepath))
+
+    def _merge_sections(self):
+        for reference, source_sections in self._extend_sections_map.items():
+            try:
+                target_section = self._sections[reference]
+            except KeyError:
+                raise ExtendReferenceDoesNotExistError(
+                    'Invalid "Styleguide{section_type} {reference}". '
+                    'No normal section with this reference exists. '
+                    'In file: {filepath}.'.format(
+                        section_type=source_sections[0].section_type,
+                        filepath=source_sections[0].filepath,
+                        reference=reference
+                    ))
+            else:
+                for source_section in source_sections:
+                    source_section.merge_into_section(target_section=target_section)
+
+    def finish(self):
+        """
+        Handle merge and replace, and set ``self.sections`` to
+        the resulting dict of sections.
+        """
+        self._replace_sections()
+        self._merge_sections()
+        self._finished = True
+
+    def __check_finished(self, property_):
+        if not self._finished:
+            raise Exception('You have to call finish() before using '
+                            'the {} property'.format(property_))
+
+    @property
+    def sections(self):
+        self.__check_finished('sections')
+        return self._sections
+
+    @property
+    def ignored_extend_sections(self):
+        self.__check_finished('ignored_extend_sections')
+        return self._ignored_extend_sections
+
+    @property
+    def replaced_sections(self):
+        self.__check_finished('replaced_sections')
+        return self._replaced_sections
 
 
 class Parser(object):
@@ -86,28 +207,16 @@ class Parser(object):
         return variablemap
 
     def parse(self):
-        sections = {}
         variablemap = self._make_variablemap()
-
+        multiblockparser = MultiCommentBlockParser()
         for filepath in self.find_files():
-            parser = CommentParser(filepath, variablemap=variablemap)
-            for block in parser.blocks:
-                section = Section(block, filepath=filepath)
-                try:
-                    section.parse()
-                except NotSectionError:
-                    pass
-                else:
-                    if section.reference in sections:
-                        first_defined_section = sections[section.reference]
-                        raise DuplicateReferenceError(
-                            reference=section.reference,
-                            first_defined_section=first_defined_section,
-                            duplicate_section=section
-                        )
-                    else:
-                        sections[section.reference] = section
-        return sections
+            commentparser = CommentParser(filepath, variablemap=variablemap)
+            for commentblock in commentparser.blocks:
+                multiblockparser.parse_commentblock(
+                    commentblock=commentblock,
+                    filepath=filepath)
+        multiblockparser.finish()
+        return multiblockparser
 
     def find_files(self):
         """
@@ -124,14 +233,18 @@ class Parser(object):
                         yield os.path.join(subpath, filename)
 
     @property
+    def multiblockparser(self):
+        if not hasattr(self, '_multiblockparser'):
+            self._multiblockparser = self.parse()
+        return self._multiblockparser
+
+    @property
     def sections(self):
         """
         A dict of sections with :meth:`~pythonkss.section.Section.reference` as key
         and :class:`:meth:`~pythonkss.section.Section` objects as value.
         """
-        if not hasattr(self, '_sections'):
-            self._sections = self.parse()
-        return self._sections
+        return self.multiblockparser.sections
 
     def get_sections(self, referenceprefix=None):
         """

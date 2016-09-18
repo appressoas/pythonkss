@@ -2,7 +2,8 @@ import os
 import unittest
 
 import pythonkss
-from pythonkss.exceptions import DuplicateReferenceError
+from pythonkss.exceptions import DuplicateReferenceError, ExtendReferenceDoesNotExistError, \
+    ReplaceReferenceDoesNotExistError
 
 
 class ParseTestCase(unittest.TestCase):
@@ -192,3 +193,75 @@ class ParseTestCase(unittest.TestCase):
         parser = pythonkss.Parser(os.path.join(self.fixtures_path, 'duplicate_reference'))
         with self.assertRaises(DuplicateReferenceError):
             parser.parse()
+
+    def test_extend_nonexisting(self):
+        parser = pythonkss.Parser(
+            os.path.join(self.fixtures_path, 'extend_nonexisting'))
+        with self.assertRaises(ExtendReferenceDoesNotExistError):
+            parser.parse()
+
+    def test_parse_extend(self):
+        parser = pythonkss.Parser(
+            os.path.join(self.fixtures_path, 'extend'))
+        sections = list(parser.get_sections())
+
+        self.assertEqual(len(sections), 1)
+        self.assertEqual(sections[0].reference,
+                         'extend.strong')
+        self.assertEqual(sections[0].title, 'title prefix Strong title suffix')
+        self.assertEqual(sections[0].description,
+                         'Extra description before.\n\n'
+                         'The description.\n\n'
+                         'Extra description after.')
+
+        self.assertEqual(len(sections[0].examples), 3)
+        self.assertEqual(sections[0].examples[0].text,
+                         '<strong>Extra example before</strong>')
+        self.assertEqual(sections[0].examples[1].text,
+                         '<strong>Example</strong>')
+        self.assertEqual(sections[0].examples[2].text,
+                         '<strong>Extra example after</strong>')
+
+    def test_parse_extend_keeps_information_about_ignored_merges(self):
+        parser = pythonkss.Parser(
+            os.path.join(self.fixtures_path, 'replace'))
+        self.assertEqual(len(parser.multiblockparser.ignored_extend_sections), 2)
+        self.assertEqual(
+            parser.multiblockparser.ignored_extend_sections[0].title,
+            'title prefix'
+        )
+        self.assertEqual(
+            parser.multiblockparser.ignored_extend_sections[1].title,
+            'title suffix'
+        )
+
+    def test_replace_nonexisting(self):
+        parser = pythonkss.Parser(
+            os.path.join(self.fixtures_path, 'replace_nonexisting'))
+        with self.assertRaises(ReplaceReferenceDoesNotExistError):
+            parser.parse()
+
+    def test_parse_replace(self):
+        parser = pythonkss.Parser(
+            os.path.join(self.fixtures_path, 'replace'))
+        sections = list(parser.get_sections())
+
+        self.assertEqual(len(sections), 1)
+        self.assertEqual(sections[0].reference,
+                         'replace.strong')
+        self.assertEqual(sections[0].title, 'Replaced Strong title')
+        self.assertEqual(sections[0].description,
+                         'The replaced description.')
+
+        self.assertEqual(len(sections[0].examples), 1)
+        self.assertEqual(sections[0].examples[0].text,
+                         '<strong>Replaced example</strong>')
+
+    def test_parse_replace_keeps_information_about_replaced(self):
+        parser = pythonkss.Parser(
+            os.path.join(self.fixtures_path, 'replace'))
+        self.assertEqual(len(parser.multiblockparser.replaced_sections), 1)
+        self.assertEqual(
+            parser.multiblockparser.replaced_sections[0].title,
+            'Strong'
+        )
