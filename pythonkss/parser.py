@@ -130,7 +130,7 @@ class MultiCommentBlockParser(object):
 
 class Parser(object):
     """
-    KSS parser.
+    Parses one or more directories of style files.
 
     Examples:
 
