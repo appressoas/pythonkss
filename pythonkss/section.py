@@ -36,7 +36,6 @@ class SectionParser(object):
         self.description_lines = []
         self.example_lines = []
         self.example_argumentstring = None
-        self.parse()
 
     def _reset_in_booleans(self):
         self.in_example = False
@@ -90,24 +89,48 @@ class SectionParser(object):
             self.reference_segment_list = self.raw_reference_segment_list[0:-1] + [text]
             self.reference = '.'.join(self.reference_segment_list)
 
-    def _parse_reference(self, line):
+    def _parse_styleguide_line(self, line):
         match = reference_re.match(line)
         if match:
             self._parse_raw_reference(match.groups()[0])
 
-    def parse(self):
+    def parse(self, reference=None, title=None):
+        """
+        Parse the section.
+
+        Args:
+            reference: If provided, we parse the provided reference
+                instead of extracting it from the content
+                after ``Styleguide`` on the last line of the comment.
+            title: If provided, we use the provided title
+                instead of extracting it from the first line of the comment.
+        """
         lines = self.comment.strip().splitlines()
-        if len(lines) < 2:
+        minimum_lines = 2
+        if reference:
+            minimum_lines -= 1
+        if title:
+            minimum_lines -= 1
+        if len(lines) < minimum_lines:
             raise NotSectionError('Not a section. A section must have at least 2 lines.',
                                   comment_lines=lines)
-        self._parse_reference(lines[-1])
+        if reference:
+            self._parse_raw_reference(reference)
+        else:
+            styleguide_line = lines.pop()
+            self._parse_styleguide_line(styleguide_line)
         if self.reference is None:
             raise NotSectionError('Not a section. A section must have the reference on the last line.',
                                   comment_lines=lines)
-        self._parse_title(lines[0])
+
+        if title:
+            self._parse_title(title)
+        else:
+            self._parse_title(lines[0])
+            lines = lines[1:]
 
         self._reset_in_booleans()
-        for line in lines[1:-1]:
+        for line in lines:
             self.parse_body_line(line=line)
         self.description = '\n'.join(self.description_lines).strip()
         if self.example_lines:
@@ -127,8 +150,15 @@ class Section(object):
     def filename(self):
         return os.path.basename(self.filepath)
 
-    def parse(self):
+    def parse(self, **kwargs):
+        """
+        Parse the section.
+
+        Args:
+            **kwargs: Forwarded to :meth:`.SectionParser.parse`.
+        """
         sectionparser = SectionParser(comment=self.comment)
+        sectionparser.parse(**kwargs)
         self._title = sectionparser.title
         self._description = sectionparser.description
         self._reference = sectionparser.reference

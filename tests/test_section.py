@@ -56,6 +56,38 @@ class SectionTestCase(unittest.TestCase):
         comment = '\n\n'.join(commentparts)
         return Section(comment, filepath='example.css')
 
+    def test_parse_reference_supplied(self):
+        comment = 'The title\nThe description'
+        section = Section(comment)
+        section.parse(reference='a.b')
+        self.assertEqual(section.reference, 'a.b')
+        self.assertEqual(section.title, 'The title')
+        self.assertEqual(section.description, 'The description')
+
+    def test_parse_title_supplied(self):
+        comment = 'The description\nStyleguide a.b'
+        section = Section(comment)
+        section.parse(title='Provided title')
+        self.assertEqual(section.reference, 'a.b')
+        self.assertEqual(section.title, 'Provided title')
+        self.assertEqual(section.description, 'The description')
+
+    def test_parse_title_and_reference_supplied_empty_body(self):
+        comment = ''
+        section = Section(comment)
+        section.parse(title='Provided title', reference='a.b')
+        self.assertEqual(section.reference, 'a.b')
+        self.assertEqual(section.title, 'Provided title')
+        self.assertEqual(section.description, '')
+
+    def test_parse_title_and_reference_supplied_with_body(self):
+        comment = 'The description'
+        section = Section(comment)
+        section.parse(title='Provided title', reference='a.b')
+        self.assertEqual(section.reference, 'a.b')
+        self.assertEqual(section.title, 'Provided title')
+        self.assertEqual(section.description, 'The description')
+
     def test_description_html_from_markdown(self):
         self.assertEqual(
             '<p>\n   Hello\n  </p>',
