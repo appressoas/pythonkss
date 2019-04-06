@@ -5,6 +5,11 @@ from pythonkss import exceptions
 from pythonkss import markdownformatter
 from yaml import YAMLError
 
+try:
+    from yaml import CLoader as Loader
+except ImportError:
+    from yaml import Loader
+
 
 class Example(object):
     """
@@ -54,7 +59,9 @@ class Example(object):
             arguments = arguments[1:]
             title = title.strip()
             try:
-                argumentdict = yaml.load('{{{arguments}}}'.format(arguments=arguments))
+                argumentdict = yaml.load(
+                    '{{{arguments}}}'.format(arguments=arguments),
+                    Loader=Loader)
             except YAMLError as e:
                 raise exceptions.ArgumentStringError('Invalid argument string: {!r}. {}'.format(
                     self.argumentstring, e))

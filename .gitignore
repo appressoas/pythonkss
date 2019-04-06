@@ -6,4 +6,6 @@ dist
 /.cache/
 
 .idea/
+.vscode/
+.eggs/
 not_for_deploy/docs/_build/

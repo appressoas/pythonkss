@@ -10,9 +10,6 @@ class MarkdownFormatter(object):
         # Break into new ul/ol tag when the next line starts with another class of list indicator
         'sane_lists',
 
-        # Do not let hello_world create an <em>,
-        'smart_strong',
-
         # Support definition lists
         'def_list',
 
