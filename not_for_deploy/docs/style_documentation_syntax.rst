@@ -236,7 +236,7 @@ Paragraphs are just one or more lines of consecutive text followed by one or mor
 
 Headings
 ========
-.. code-block:: markdown
+.. code-block:: md
 
     # Largest heading
     ## Second largest heading

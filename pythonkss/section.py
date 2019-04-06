@@ -247,7 +247,7 @@ class Section(object):
     @property
     def examples(self):
         """
-        Get all ``Example:`` sections as a list of :class:`pythonkss.example.Example` objects.
+        Get all ``Example`` sections as a list of :class:`pythonkss.example.Example` objects.
         """
         if not hasattr(self, '_examples'):
             self.parse()
