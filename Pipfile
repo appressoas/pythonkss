@@ -1,0 +1,21 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[packages]
+markdown = "*"
+pygments = "*"
+beautifulsoup4 = "<5"
+html5lib = "*"
+pyyaml = "*"
+sphinx = "*"
+
+[dev-packages]
+flake8 = "*"
+pytest = "==5.3.5"
+pytest-django = "==3.8.0"
+pytest-env = "==0.6.2"
+
+[requires]
+python_version = "3.7"
